@@ -16,14 +16,11 @@ const animaisExtincao = [
   { nome: "Tamanduá-bandeira", url: "imagens/tamandua.jpg", fallbackUrl: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🦥" }
 ];
 
-// Instâncias de som da pasta /sons (opcionais, tratadas para não quebrar o script se o arquivo não existir)
 function tocarSom(caminho) {
   try {
     const audio = new Audio(caminho);
     audio.play().catch(() => {});
-  } catch (e) {
-    // Ignora se o áudio não estiver carregado
-  }
+  } catch (e) {}
 }
 
 const elementoSaldo = document.getElementById("saldo");
@@ -54,7 +51,6 @@ async function carregarSaldo() {
       exibirModalSaldo();
     }
   } catch (e) {
-    console.warn("Backend /saldo não encontrado, usando saldo padrão inicial.");
     saldo = 100;
     elementoSaldo.textContent = saldo.toFixed(2);
   }
@@ -62,7 +58,11 @@ async function carregarSaldo() {
 
 function alterarTamanhoTabuleiro() {
   if (emJogo) return;
-  dimensao = parseInt(document.getElementById("tamanhoGrade").value);
+  
+  // Limita a dimensão máxima em 7x7 no JS
+  let valorSelecionado = parseInt(document.getElementById("tamanhoGrade").value);
+  dimensao = Math.min(Math.max(valorSelecionado, 5), 7);
+  
   const totalCasas = dimensao * dimensao;
   
   inputMinas.max = totalCasas - 1;
@@ -200,7 +200,6 @@ function clicarCasa(index) {
     img.alt = animal.nome;
     img.title = animal.nome;
     
-    // Fallback caso a imagem local não esteja na pasta /imagens
     img.onerror = function() {
       this.onerror = function() {
         casaClicada.innerHTML = animal.fallbackEmoji;
@@ -313,9 +312,7 @@ async function atualizarSaldoBackend(novoSaldo) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ saldo: novoSaldo })
     });
-  } catch (e) {
-    // Modo offline/sem backend ativo
-  }
+  } catch (e) {}
 }
 
 carregarSaldo();
