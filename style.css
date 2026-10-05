@@ -111,6 +111,9 @@ body {
   display: grid; 
   gap: 8px; 
   justify-content: center;
+  align-items: center;
+  margin: 0 auto;
+  max-width: 100%;
 }
 
 .casa { 
