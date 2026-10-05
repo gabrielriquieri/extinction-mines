@@ -20,6 +20,7 @@ const elementoLucroAtual = document.getElementById("lucroAtual");
 const btnAcao = document.getElementById("btnAcao");
 const elementoMensagem = document.getElementById("mensagem");
 const inputMinas = document.getElementById("qtdMinas");
+const inputAposta = document.getElementById("valorAposta");
 const modalGlitch = document.getElementById("modalGlitch");
 
 function exibirModalSaldo() {
@@ -31,18 +32,41 @@ function fecharModalSaldo() {
   modalGlitch.classList.remove("ativo");
 }
 
+// Atualiza os limites do input de aposta com base no saldo atual
+function atualizarLimitesInputAposta() {
+  if (inputAposta) {
+    inputAposta.max = saldo;
+    // Se o valor digitado atualmente for maior que o saldo, reajusta para o saldo máximo
+    if (parseFloat(inputAposta.value) > saldo) {
+      inputAposta.value = saldo > 0 ? saldo : 0;
+    }
+  }
+}
+
+// Evento para impedir que o usuário digite um valor maior que o saldo em tempo real
+if (inputAposta) {
+  inputAposta.addEventListener("input", () => {
+    const valorDigitado = parseFloat(inputAposta.value);
+    if (valorDigitado > saldo) {
+      inputAposta.value = saldo;
+    }
+  });
+}
+
 async function carregarSaldo() {
   try {
     const resposta = await fetch("/saldo");
     const dados = await resposta.json();
     saldo = Number(dados.saldo);
     elementoSaldo.textContent = saldo.toFixed(2);
+    atualizarLimitesInputAposta();
     if (saldo <= 0) {
       exibirModalSaldo();
     }
   } catch (e) {
     saldo = 100;
     elementoSaldo.textContent = saldo.toFixed(2);
+    atualizarLimitesInputAposta();
   }
 }
 
@@ -87,18 +111,19 @@ function gerenciarBotaoAcao() {
 }
 
 async function iniciarJogo() {
-  const inputAposta = parseFloat(document.getElementById("valorAposta").value);
+  const valorInput = parseFloat(inputAposta.value);
   const minasQtd = parseInt(inputMinas.value);
   const totalCasas = dimensao * dimensao;
 
-  if (isNaN(inputAposta) || inputAposta <= 0) {
+  if (isNaN(valorInput) || valorInput <= 0) {
     alert("Por favor, insira um valor de aposta válido.");
     return;
   }
 
-  // CORREÇÃO DO BUG: Impede apostar mais do que o saldo atual
-  if (Number(inputAposta.toFixed(2)) > Number(saldo.toFixed(2))) {
+  // Trava de segurança no clique do botão
+  if (valorInput > saldo) {
     alert("Você não tem dracmas suficientes para essa aposta!");
+    inputAposta.value = saldo;
     exibirModalSaldo();
     return;
   }
@@ -108,8 +133,9 @@ async function iniciarJogo() {
     return;
   }
 
-  valorAposta = inputAposta;
+  valorAposta = valorInput;
   saldo -= valorAposta;
+  atualizarLimitesInputAposta();
   atualizarSaldoBackend(saldo);
 
   bombas = [];
@@ -125,7 +151,7 @@ async function iniciarJogo() {
   multiplicador = 1.0;
   elementoMensagem.textContent = "";
 
-  document.getElementById("valorAposta").disabled = true;
+  inputAposta.disabled = true;
   document.getElementById("qtdMinas").disabled = true;
   document.getElementById("tamanhoGrade").disabled = true;
   
@@ -213,6 +239,7 @@ function retirarLucro() {
 
   const valorGanho = valorAposta * multiplicador;
   saldo += valorGanho;
+  atualizarLimitesInputAposta();
   atualizarSaldoBackend(saldo);
   tocarSom("sons/vitoria.mp3");
 
@@ -232,7 +259,7 @@ function retirarLucro() {
   btnAcao.disabled = true;
 
   setTimeout(() => {
-    document.getElementById("valorAposta").disabled = false;
+    inputAposta.disabled = false;
     document.getElementById("qtdMinas").disabled = false;
     document.getElementById("tamanhoGrade").disabled = false;
     
@@ -267,7 +294,7 @@ function finalizarJogo(vitoria) {
     });
   }
 
-  document.getElementById("valorAposta").disabled = false;
+  inputAposta.disabled = false;
   document.getElementById("qtdMinas").disabled = false;
   document.getElementById("tamanhoGrade").disabled = false;
   btnAcao.textContent = "Iniciar Batalha";
