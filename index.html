@@ -3,40 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mines: Resgate Selvagem</title>
+  <title>Mines: Desafio do Olimpo</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h2>🌿 Mines: Resgate Selvagem</h2>
+  <h2>⚔️ Mines: Desafio do Olimpo</h2>
 
   <div class="painel">
-    <div><strong>Moedas Disponíveis:</strong> <span id="saldo">...</span> 🪙</div>
+    <div><strong>Dracmas Disponíveis:</strong> <span id="saldo">...</span> 🪙</div>
     
     <hr class="divisor">
 
     <div class="campo-grupo">
-      <label for="tamanhoGrade">Tamanho do Tabuleiro:</label>
+      <label for="tamanhoGrade">Tamanho da Arena:</label>
       <select id="tamanhoGrade" onchange="alterarTamanhoTabuleiro()">
-        <option value="5" selected>5 x 5 (25 casas)</option>
-        <option value="6">6 x 6 (36 casas)</option>
-        <option value="7">7 x 7 (49 casas)</option>
+        <option value="5" selected>5 x 5 (25 selos)</option>
+        <option value="6">6 x 6 (36 selos)</option>
+        <option value="7">7 x 7 (49 selos)</option>
       </select>
     </div>
 
     <div class="campo-grupo">
-      <label for="valorAposta">Valor da Aposta:</label>
+      <label for="valorAposta">Aposta de Dracmas:</label>
       <input type="number" id="valorAposta" value="10" min="1" step="1">
     </div>
 
     <div class="campo-grupo">
-      <label for="qtdMinas">Quantidade de Minas:</label>
+      <label for="qtdMinas">Maldicões de Ares (Fúria):</label>
       <input type="number" id="qtdMinas" value="3" min="1" max="24">
     </div>
 
     <div class="status-bar">
-      <span>Multiplicador: <span id="multiplicador" class="destaque-verde">1.0x</span></span>
-      <span>Lucro Atual: <span id="lucroAtual" class="destaque-verde">0</span> 🪙</span>
+      <span>Multiplicador: <span id="multiplicador" class="destaque-dourado">1.0x</span></span>
+      <span>Tributo Atual: <span id="lucroAtual" class="destaque-dourado">0</span> 🪙</span>
     </div>
   </div>
 
@@ -44,14 +44,14 @@
     <div id="grade"></div>
   </div>
 
-  <button id="btnAcao" class="btn-acao btn-apostar" onclick="gerenciarBotaoAcao()">Começar Jogo</button>
+  <button id="btnAcao" class="btn-acao btn-apostar" onclick="gerenciarBotaoAcao()">Iniciar Batalha</button>
 
   <div id="mensagem"></div>
 
-  <!-- Overlay Modal de Saldo Insuficiente com Efeito Glitch -->
+  <!-- Overlay Modal de Saldo Insuficiente com Efeito Glitch Épico -->
   <div id="modalGlitch" class="modal-glitch-overlay" onclick="fecharModalSaldo()">
     <div>
-      <div class="texto-glitch" data-text="SALDO INSUFICIENTE">SALDO INSUFICIENTE</div>
+      <div class="texto-glitch" data-text="DRACMAS INSUFICIENTES">DRACMAS INSUFICIENTES</div>
       <span class="subtitulo-fechar">(Clique em qualquer lugar para fechar)</span>
     </div>
   </div>
