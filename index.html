@@ -1,61 +1,444 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mines</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+```html
+<!-- =========================
+     TELA DE CADASTRO
+========================= -->
 
-  <h2>⚔️ Mines: Desafio do Olimpo</h2>
+<div id="telaCadastro" class="tela-cadastro">
 
-  <div class="painel">
-    <div><strong>Dracmas Disponíveis:</strong> <span id="saldo">...</span> 🪙</div>
-    
-    <hr class="divisor">
+    <div class="card-cadastro">
 
-    <div class="campo-grupo">
-      <label for="tamanhoGrade">Tamanho da Arena:</label>
-      <select id="tamanhoGrade" onchange="alterarTamanhoTabuleiro()">
-        <option value="5" selected>5 x 5 (25 selos)</option>
-        <option value="6">6 x 6 (36 selos)</option>
-        <option value="7">7 x 7 (49 selos)</option>
-      </select>
+        <div class="icone-cadastro">
+            ⚔️
+        </div>
+
+        <h1>ARENA DE ARES</h1>
+
+        <h2>Cadastro do Guerreiro</h2>
+
+        <p>
+            Antes de entrar na arena, informe seu nome.
+        </p>
+
+        <form id="formCadastro">
+
+            <div class="campo">
+
+                <label for="nomeJogador">
+                    Nome ou apelido
+                </label>
+
+                <input
+                    type="text"
+                    id="nomeJogador"
+                    placeholder="Digite seu nome"
+                    maxlength="25"
+                    autocomplete="name"
+                    required
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn-entrar"
+            >
+                ⚔️ ENTRAR NO JOGO
+            </button>
+
+        </form>
+
+        <p
+            id="erroCadastro"
+            class="erro-cadastro"
+        ></p>
+
     </div>
 
-    <div class="campo-grupo">
-      <label for="valorAposta">Aposta de Dracmas:</label>
-      <input type="number" id="valorAposta" value="10" min="1" step="1">
-    </div>
+</div>
+```
 
-    <div class="campo-grupo">
-      <label for="qtdMinas">Maldicões de Ares (Fúria):</label>
-      <input type="number" id="qtdMinas" value="3" min="1" max="24">
-    </div>
+Adicione este CSS dentro do `<style>`:
 
-    <div class="status-bar">
-      <span>Multiplicador: <span id="multiplicador" class="destaque-dourado">1.0x</span></span>
-      <span>Tributo Atual: <span id="lucroAtual" class="destaque-dourado">0</span> 🪙</span>
-    </div>
-  </div>
+```css
+/* =========================
+   TELA DE CADASTRO
+========================= */
 
-  <div id="grade-container">
-    <div id="grade"></div>
-  </div>
+.tela-cadastro {
+    position: fixed;
+    inset: 0;
 
-  <button id="btnAcao" class="btn-acao btn-apostar" onclick="gerenciarBotaoAcao()">Iniciar Batalha</button>
+    z-index: 99999;
 
-  <div id="mensagem"></div>
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
-  <!-- Overlay Modal de Saldo Insuficiente com Efeito Glitch Épico -->
-  <div id="modalGlitch" class="modal-glitch-overlay" onclick="fecharModalSaldo()">
-    <div>
-      <div class="texto-glitch" data-text="DRACMAS INSUFICIENTES">DRACMAS INSUFICIENTES</div>
-      <span class="subtitulo-fechar">(Clique em qualquer lugar para fechar)</span>
-    </div>
-  </div>
+    padding: 20px;
 
-  <script src="script.js"></script>
-</body>
-</html>
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(100, 30, 0, 0.95),
+            rgba(5, 0, 0, 0.99)
+        );
+
+    backdrop-filter: blur(10px);
+}
+
+.card-cadastro {
+    width: 100%;
+    max-width: 450px;
+
+    padding: 40px 35px;
+
+    text-align: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(35, 12, 2, 0.98),
+            rgba(12, 3, 0, 0.98)
+        );
+
+    border: 2px solid #ff7700;
+
+    border-radius: 20px;
+
+    box-shadow:
+        0 0 20px #ff3300,
+        0 0 60px rgba(255, 60, 0, 0.4),
+        inset 0 0 30px rgba(255, 100, 0, 0.1);
+
+    animation: aparecerCadastro 0.5s ease;
+}
+
+@keyframes aparecerCadastro {
+
+    from {
+        opacity: 0;
+        transform: scale(0.85);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+}
+
+.icone-cadastro {
+    font-size: 60px;
+
+    margin-bottom: 10px;
+
+    filter:
+        drop-shadow(
+            0 0 15px #ff7700
+        );
+}
+
+.card-cadastro h1 {
+
+    margin: 0;
+
+    color: #ffd700;
+
+    font-size: 34px;
+
+    text-shadow:
+        0 0 10px #ff7700,
+        0 0 25px #ff3300;
+
+}
+
+.card-cadastro h2 {
+
+    margin-top: 8px;
+
+    color: #ff9900;
+
+    font-size: 21px;
+
+}
+
+.card-cadastro p {
+
+    color: #ccc;
+
+    line-height: 1.5;
+
+}
+
+.campo {
+
+    text-align: left;
+
+    margin-top: 25px;
+
+}
+
+.campo label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #ffd700;
+
+    font-weight: bold;
+
+}
+
+.campo input {
+
+    width: 100%;
+
+    padding: 15px;
+
+    border: 2px solid #8a3600;
+
+    border-radius: 10px;
+
+    outline: none;
+
+    background: #100502;
+
+    color: white;
+
+    font-size: 16px;
+
+    transition: 0.2s;
+
+}
+
+.campo input:focus {
+
+    border-color: #ff9900;
+
+    box-shadow:
+        0 0 15px
+        rgba(255, 119, 0, 0.5);
+
+}
+
+.btn-entrar {
+
+    width: 100%;
+
+    margin-top: 22px;
+
+    padding: 16px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #ff3300,
+            #ff9900
+        );
+
+    color: white;
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+.btn-entrar:hover {
+
+    transform: scale(1.03);
+
+    box-shadow:
+        0 0 20px #ff6600;
+
+}
+
+.btn-entrar:active {
+
+    transform: scale(0.98);
+
+}
+
+.erro-cadastro {
+
+    min-height: 20px;
+
+    margin-top: 15px;
+
+    color: #ff4444 !important;
+
+}
+
+.escondido {
+
+    display: none !important;
+
+}
+
+@media (max-width: 500px) {
+
+    .card-cadastro {
+
+        padding: 30px 22px;
+
+    }
+
+    .card-cadastro h1 {
+
+        font-size: 27px;
+
+    }
+
+}
+```
+
+E substitua a parte do JavaScript responsável pelo cadastro por:
+
+```javascript
+/* =========================
+   CADASTRO
+========================= */
+
+const telaCadastro =
+    document.getElementById("telaCadastro");
+
+const formCadastro =
+    document.getElementById("formCadastro");
+
+const nomeJogador =
+    document.getElementById("nomeJogador");
+
+const erroCadastro =
+    document.getElementById("erroCadastro");
+
+const jogador =
+    document.getElementById("jogador");
+
+
+/* Verifica se já existe um cadastro */
+
+function verificarCadastro() {
+
+    const nomeSalvo =
+        localStorage.getItem("nomeJogador");
+
+    if (nomeSalvo) {
+
+        jogador.textContent =
+            `⚔️ Guerreiro: ${nomeSalvo}`;
+
+        telaCadastro.classList.add(
+            "escondido"
+        );
+
+    } else {
+
+        telaCadastro.classList.remove(
+            "escondido"
+        );
+
+    }
+
+}
+
+
+/* Quando clicar em ENTRAR */
+
+formCadastro.addEventListener(
+    "submit",
+    function(event) {
+
+        event.preventDefault();
+
+        const nome =
+            nomeJogador.value.trim();
+
+
+        if (nome.length < 2) {
+
+            erroCadastro.textContent =
+                "Digite pelo menos 2 caracteres.";
+
+            return;
+
+        }
+
+
+        if (nome.length > 25) {
+
+            erroCadastro.textContent =
+                "O nome pode ter no máximo 25 caracteres.";
+
+            return;
+
+        }
+
+
+        /* Salva o nome no navegador */
+
+        localStorage.setItem(
+            "nomeJogador",
+            nome
+        );
+
+
+        /* Mostra o jogador no jogo */
+
+        jogador.textContent =
+            `⚔️ Guerreiro: ${nome}`;
+
+
+        erroCadastro.textContent = "";
+
+
+        /* Fecha a tela de cadastro */
+
+        telaCadastro.classList.add(
+            "escondido"
+        );
+
+    }
+);
+```
+
+E mantenha no HTML do jogo esta parte:
+
+```html
+<p id="jogador"></p>
+```
+
+Por fim, no final do JavaScript, deixe:
+
+```javascript
+verificarCadastro();
+carregarSaldo();
+alterarTamanhoTabuleiro();
+gerarFagulhasFundo();
+```
+
+### Como vai funcionar
+
+**Primeira vez:**
+
+`Site → Tela de cadastro → Digita nome → Entrar no jogo → Tabuleiro`
+
+**Depois:**
+
+`Site → Nome já salvo → Jogo`
+
+Se quiser testar novamente a tela de cadastro, abra o console do navegador e execute:
+
+```javascript
+localStorage.removeItem("nomeJogador");
+```
+
+Depois atualize a página.
