@@ -6,16 +6,6 @@ let acertos = 0;
 let multiplicador = 1.0;
 let dimensao = 5;
 
-// Artefatos e Deuses da Mitologia Grega
-const reliquiasOlimpo = [
-  { nome: "Lâminas do Caos", url: "imagens/laminas.jpg", fallbackUrl: "https://images.unsplash.com/photo-1599751449128-ec71888ada76?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "⚔️" },
-  { nome: "Raio de Zeus", url: "imagens/zeus.jpg", fallbackUrl: "https://images.unsplash.com/photo-1516655855035-d5215bcb5604?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "⚡" },
-  { nome: "Tridente de Poseidon", url: "imagens/poseidon.jpg", fallbackUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🔱" },
-  { nome: "Elmo de Hades", url: "imagens/hades.jpg", fallbackUrl: "https://images.unsplash.com/photo-1509210934974-a690e5a61d8a?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "👑" },
-  { nome: "Escudo de Atena", url: "imagens/atena.jpg", fallbackUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🛡️" },
-  { nome: "Velo de Ouro", url: "imagens/velo.jpg", fallbackUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🏆" }
-];
-
 function tocarSom(caminho) {
   try {
     const audio = new Audio(caminho);
@@ -186,28 +176,16 @@ function clicarCasa(index) {
 
   if (bombas.includes(index)) {
     casaClicada.textContent = "💀";
+    casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-bomba", "explosao-unica");
     criarEfeitoExplosao(casaClicada);
     tocarSom("sons/explosao.mp3");
 
     finalizarJogo(false);
   } else {
-    const reliquia = reliquiasOlimpo[Math.floor(Math.random() * reliquiasOlimpo.length)];
-    
-    const img = document.createElement("img");
-    img.src = reliquia.url;
-    img.alt = reliquia.nome;
-    img.title = reliquia.nome;
-    
-    img.onerror = function() {
-      this.onerror = function() {
-        casaClicada.innerHTML = reliquia.fallbackEmoji;
-        casaClicada.style.fontSize = "30px";
-      };
-      this.src = reliquia.fallbackUrl;
-    };
-
-    casaClicada.appendChild(img);
+    // Revela a coroa no lugar de imagens aleatórias
+    casaClicada.textContent = "👑";
+    casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-reliquia");
     casaClicada.disabled = true;
 
@@ -245,6 +223,7 @@ function retirarLucro() {
     casa.disabled = true;
     if (bombas.includes(idx)) {
       casa.textContent = "💀";
+      casa.style.fontSize = "30px";
       casa.classList.add("revelado-bomba", "chacoalhar-bomba");
     }
   });
@@ -281,6 +260,7 @@ function finalizarJogo(vitoria) {
       casa.disabled = true;
       if (bombas.includes(idx) && !casa.classList.contains("revelado-bomba")) {
         casa.textContent = "💀";
+        casa.style.fontSize = "30px";
         casa.classList.add("revelado-bomba");
       }
     });
