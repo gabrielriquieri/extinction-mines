@@ -6,14 +6,14 @@ let acertos = 0;
 let multiplicador = 1.0;
 let dimensao = 5;
 
-// Caminhos para a pasta /imagens (com imagem local ou fallback online)
-const animaisExtincao = [
-  { nome: "Mico-leão-dourado", url: "imagens/mico-leao.jpg", fallbackUrl: "https://images.unsplash.com/photo-1540573133985-7523134d2185?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🐒" },
-  { nome: "Onça-pintada", url: "imagens/onca.jpg", fallbackUrl: "https://images.unsplash.com/photo-1561731216-c3a4d99437d5?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🐆" },
-  { nome: "Arara-azul", url: "imagens/arara.jpg", fallbackUrl: "https://images.unsplash.com/photo-1552728089-57bdde30beb3?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🦜" },
-  { nome: "Lobo-guará", url: "imagens/lobo.jpg", fallbackUrl: "https://images.unsplash.com/photo-1534188753412-3e26d0d618d6?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🦊" },
-  { nome: "Tartaruga-marinha", url: "imagens/tartaruga.jpg", fallbackUrl: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🐢" },
-  { nome: "Tamanduá-bandeira", url: "imagens/tamandua.jpg", fallbackUrl: "https://images.unsplash.com/photo-1534567153574-2b12153a87f0?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🦥" }
+// Artefatos e Deuses da Mitologia Grega
+const reliquiasOlimpo = [
+  { nome: "Lâminas do Caos", url: "imagens/laminas.jpg", fallbackUrl: "https://images.unsplash.com/photo-1599751449128-ec71888ada76?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "⚔️" },
+  { nome: "Raio de Zeus", url: "imagens/zeus.jpg", fallbackUrl: "https://images.unsplash.com/photo-1516655855035-d5215bcb5604?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "⚡" },
+  { nome: "Tridente de Poseidon", url: "imagens/poseidon.jpg", fallbackUrl: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🔱" },
+  { nome: "Elmo de Hades", url: "imagens/hades.jpg", fallbackUrl: "https://images.unsplash.com/photo-1509210934974-a690e5a61d8a?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "👑" },
+  { nome: "Escudo de Atena", url: "imagens/atena.jpg", fallbackUrl: "https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🛡️" },
+  { nome: "Velo de Ouro", url: "imagens/velo.jpg", fallbackUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=150&q=80", fallbackEmoji: "🏆" }
 ];
 
 function tocarSom(caminho) {
@@ -59,7 +59,6 @@ async function carregarSaldo() {
 function alterarTamanhoTabuleiro() {
   if (emJogo) return;
   
-  // Limita a dimensão máxima em 7x7 no JS
   let valorSelecionado = parseInt(document.getElementById("tamanhoGrade").value);
   dimensao = Math.min(Math.max(valorSelecionado, 5), 7);
   
@@ -77,7 +76,6 @@ function criarGrade() {
   elementoGrade.innerHTML = "";
   const totalCasas = dimensao * dimensao;
 
-  // Ajusta a grelha dinamicamente para caber perfeitamente no ecrã do notebook
   elementoGrade.style.gridTemplateColumns = `repeat(${dimensao}, minmax(40px, 56px))`;
 
   for (let i = 0; i < totalCasas; i++) {
@@ -89,6 +87,7 @@ function criarGrade() {
     elementoGrade.appendChild(casa);
   }
 }
+
 function gerenciarBotaoAcao() {
   if (!emJogo) {
     iniciarJogo();
@@ -113,7 +112,7 @@ async function iniciarJogo() {
   }
 
   if (isNaN(minasQtd) || minasQtd < 1 || minasQtd >= totalCasas) {
-    alert(`Escolha entre 1 e ${totalCasas - 1} minas.`);
+    alert(`Escolha entre 1 e ${totalCasas - 1} maldições de Ares.`);
     return;
   }
 
@@ -138,7 +137,7 @@ async function iniciarJogo() {
   document.getElementById("qtdMinas").disabled = true;
   document.getElementById("tamanhoGrade").disabled = true;
   
-  btnAcao.textContent = "Retirar (Cash Out)";
+  btnAcao.textContent = "Clamar Recompensa (Cash Out)";
   btnAcao.className = "btn-acao btn-retirar";
   btnAcao.disabled = true;
 
@@ -149,7 +148,7 @@ async function iniciarJogo() {
 }
 
 function criarEfeitoExplosao(elemento) {
-  const cores = ["#ff4d4d", "#ff9900", "#ffff00", "#ff1a1a", "#555555"];
+  const cores = ["#ff2222", "#ff7700", "#ffcc00", "#ff0055", "#880000"];
   const qtdParticulas = 24;
 
   for (let i = 0; i < qtdParticulas; i++) {
@@ -186,30 +185,30 @@ function clicarCasa(index) {
   if (casaClicada.innerHTML !== "") return;
 
   if (bombas.includes(index)) {
-    casaClicada.textContent = "💣";
+    casaClicada.textContent = "💀";
     casaClicada.classList.add("revelado-bomba", "explosao-unica");
     criarEfeitoExplosao(casaClicada);
     tocarSom("sons/explosao.mp3");
 
     finalizarJogo(false);
   } else {
-    const animal = animaisExtincao[Math.floor(Math.random() * animaisExtincao.length)];
+    const reliquia = reliquiasOlimpo[Math.floor(Math.random() * reliquiasOlimpo.length)];
     
     const img = document.createElement("img");
-    img.src = animal.url;
-    img.alt = animal.nome;
-    img.title = animal.nome;
+    img.src = reliquia.url;
+    img.alt = reliquia.nome;
+    img.title = reliquia.nome;
     
     img.onerror = function() {
       this.onerror = function() {
-        casaClicada.innerHTML = animal.fallbackEmoji;
+        casaClicada.innerHTML = reliquia.fallbackEmoji;
         casaClicada.style.fontSize = "30px";
       };
-      this.src = animal.fallbackUrl;
+      this.src = reliquia.fallbackUrl;
     };
 
     casaClicada.appendChild(img);
-    casaClicada.classList.add("revelado-animal");
+    casaClicada.classList.add("revelado-reliquia");
     casaClicada.disabled = true;
 
     acertos++;
@@ -238,14 +237,14 @@ function retirarLucro() {
   atualizarSaldoBackend(saldo);
   tocarSom("sons/vitoria.mp3");
 
-  elementoMensagem.style.color = "#85e085";
-  elementoMensagem.textContent = `🎉 Você resgatou os animais e retirou ${valorGanho.toFixed(2)} moedas!`;
+  elementoMensagem.style.color = "#ffd700";
+  elementoMensagem.textContent = `🏛️ Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
 
   const casas = document.querySelectorAll(".casa");
   casas.forEach((casa, idx) => {
     casa.disabled = true;
     if (bombas.includes(idx)) {
-      casa.textContent = "💣";
+      casa.textContent = "💀";
       casa.classList.add("revelado-bomba", "chacoalhar-bomba");
     }
   });
@@ -257,7 +256,7 @@ function retirarLucro() {
     document.getElementById("qtdMinas").disabled = false;
     document.getElementById("tamanhoGrade").disabled = false;
     
-    btnAcao.textContent = "Começar Jogo";
+    btnAcao.textContent = "Iniciar Batalha";
     btnAcao.className = "btn-acao btn-apostar";
     btnAcao.disabled = false;
 
@@ -275,13 +274,13 @@ function finalizarJogo(vitoria) {
 
   if (!vitoria) {
     elementoMensagem.style.color = "#ff4d4d";
-    elementoMensagem.textContent = `💥 Você pisou em uma mina e perdeu ${valorAposta.toFixed(2)} moedas!`;
+    elementoMensagem.textContent = `💥 A fúria de Ares o destruiu! Você perdeu ${valorAposta.toFixed(2)} dracmas!`;
 
     const casas = document.querySelectorAll(".casa");
     casas.forEach((casa, idx) => {
       casa.disabled = true;
       if (bombas.includes(idx) && !casa.classList.contains("revelado-bomba")) {
-        casa.textContent = "💣";
+        casa.textContent = "💀";
         casa.classList.add("revelado-bomba");
       }
     });
@@ -290,7 +289,7 @@ function finalizarJogo(vitoria) {
   document.getElementById("valorAposta").disabled = false;
   document.getElementById("qtdMinas").disabled = false;
   document.getElementById("tamanhoGrade").disabled = false;
-  btnAcao.textContent = "Começar Jogo";
+  btnAcao.textContent = "Iniciar Batalha";
   btnAcao.className = "btn-acao btn-apostar";
   btnAcao.disabled = false;
 
@@ -315,5 +314,39 @@ async function atualizarSaldoBackend(novoSaldo) {
   } catch (e) {}
 }
 
+// --- Gerador de Fagulhas de Fogo Subindo ---
+function gerarFagulhasFundo() {
+  let container = document.getElementById("fagulhas-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "fagulhas-container";
+    document.body.appendChild(container);
+  }
+
+  const cores = ["#ff3300", "#ff7700", "#ffaa00", "#ff0000"];
+  const quantidade = 35;
+
+  for (let i = 0; i < quantidade; i++) {
+    const fagulha = document.createElement("div");
+    fagulha.className = "fagulha";
+    
+    fagulha.style.left = Math.random() * 100 + "vw";
+    
+    const duracao = 3 + Math.random() * 5;
+    fagulha.style.animationDuration = duracao + "s";
+    fagulha.style.animationDelay = (Math.random() * 4) + "s";
+    
+    const tamanho = 3 + Math.random() * 5;
+    fagulha.style.width = tamanho + "px";
+    fagulha.style.height = tamanho + "px";
+    fagulha.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+    fagulha.style.boxShadow = `0 0 8px ${fagulha.style.backgroundColor}`;
+
+    container.appendChild(fagulha);
+  }
+}
+
+// Iniciar funções
 carregarSaldo();
 alterarTamanhoTabuleiro();
+gerarFagulhasFundo();
