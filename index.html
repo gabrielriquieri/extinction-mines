@@ -5,298 +5,249 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Arena de Ares</title>
+    <title>ARENA DE ARES</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-    <!-- =================================
+    <!-- =========================
          TELA DE CADASTRO
-    ================================== -->
+    ========================== -->
 
     <div id="telaCadastro" class="tela-cadastro">
 
-        <div class="card-cadastro">
+        <div class="cadastro-caixa">
 
-            <div class="icone-cadastro">⚔️</div>
+            <div class="titulo-principal">
+                ⚔️ ARENA DE ARES ⚔️
+            </div>
 
-            <h1>ARENA DE ARES</h1>
-
-            <h2>Cadastro do Guerreiro</h2>
-
-            <p class="descricao">
-                Crie seu perfil para entrar na arena.
+            <p class="subtitulo">
+                Entre na arena para começar sua batalha
             </p>
 
             <form id="formCadastro">
 
-    <!-- NOME DE USUÁRIO -->
-    <div class="campo">
-        <label for="nomeUsuario">
-            👤 Nome de usuário
-        </label>
+                <!-- NOME DE USUÁRIO -->
+                <div class="campo">
+                    <label for="nomeUsuario">
+                        👤 Nome de usuário
+                    </label>
 
-        <input
-            type="text"
-            id="nomeUsuario"
-            placeholder="Digite seu nome de usuário"
-            maxlength="25"
-            autocomplete="off"
-            required
-        >
-    </div>
+                    <input
+                        type="text"
+                        id="nomeUsuario"
+                        name="username"
+                        placeholder="Digite seu nome de usuário"
+                        maxlength="25"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
 
+                <!-- TELEFONE -->
+                <div class="campo">
+                    <label for="telefone">
+                        📱 Número de telefone
+                    </label>
 
-    <!-- TELEFONE -->
-    <div class="campo">
-        <label for="telefone">
-            📱 Número de telefone
-        </label>
+                    <input
+                        type="tel"
+                        id="telefone"
+                        name="phone"
+                        placeholder="(00) 00000-0000"
+                        maxlength="15"
+                        autocomplete="off"
+                        inputmode="numeric"
+                        required
+                    >
+                </div>
 
-        <input
-            type="tel"
-            id="telefone"
-            placeholder="(00) 00000-0000"
-            maxlength="15"
-            autocomplete="off"
-            required
-        >
-    </div>
+                <!-- EMAIL -->
+                <div class="campo">
+                    <label for="email">
+                        📧 E-mail
+                    </label>
 
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="exemplo@email.com"
+                        autocomplete="off"
+                        required
+                    >
+                </div>
 
-    <!-- E-MAIL -->
-    <div class="campo">
-        <label for="email">
-            📧 E-mail
-        </label>
+                <!-- SENHA -->
+                <div class="campo">
+                    <label for="senha">
+                        🔒 Senha
+                    </label>
 
-        <input
-            type="email"
-            id="email"
-            placeholder="exemplo@email.com"
-            autocomplete="off"
-            required
-        >
-    </div>
+                    <input
+                        type="password"
+                        id="senha"
+                        name="new-password"
+                        placeholder="Crie uma senha para teste"
+                        minlength="6"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
 
+                <!-- CONFIRMAR SENHA -->
+                <div class="campo">
+                    <label for="confirmarSenha">
+                        🔐 Confirme sua senha
+                    </label>
 
-    <!-- SENHA -->
-    <div class="campo">
-        <label for="senha">
-            🔒 Senha
-        </label>
+                    <input
+                        type="password"
+                        id="confirmarSenha"
+                        name="confirm-password"
+                        placeholder="Digite sua senha novamente"
+                        minlength="6"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
 
-        <input
-            type="password"
-            id="senha"
-            placeholder="Digite sua senha"
-            minlength="6"
-            autocomplete="new-password"
-            required
-        >
-    </div>
-
-
-    <!-- CONFIRMAR SENHA -->
-    <div class="campo">
-        <label for="confirmarSenha">
-            🔐 Confirme sua senha
-        </label>
-
-        <input
-            type="password"
-            id="confirmarSenha"
-            placeholder="Digite sua senha novamente"
-            minlength="6"
-            autocomplete="new-password"
-            required
-        >
-    </div>
-
+                <p id="erroCadastro" class="erro-cadastro"></p>
 
                 <p class="aviso-cadastro">
                     ⚠️ Demonstração: estes dados não são enviados
                     nem armazenados pelo jogo.
                 </p>
 
-
-                <button
-                    type="submit"
-                    class="btn-entrar"
-                >
+                <button type="submit" class="btn-entrar">
                     ⚔️ ENTRAR NA ARENA
                 </button>
 
             </form>
-
-
-            <p
-                id="erroCadastro"
-                class="erro-cadastro"
-            ></p>
 
         </div>
 
     </div>
 
 
-    <!-- =================================
-         FUNDO
-    ================================== -->
-
-    <div id="fagulhas-container"></div>
-
-
-    <!-- =================================
+    <!-- =========================
          JOGO
-    ================================== -->
+    ========================== -->
 
-    <main class="container">
+    <main id="jogo" class="jogo escondido">
 
         <header class="topo">
 
             <div>
-
-                <h1>⚔️ ARENA DE ARES</h1>
-
-                <p id="jogador">
-                    Guerreiro
-                </p>
-
+                <h1>⚔️ ARENA DE ARES ⚔️</h1>
+                <p id="jogador">Guerreiro</p>
             </div>
 
-            <button
-                id="btnTrocarJogador"
-                class="btn-secundario"
-            >
+            <button id="btnTrocarJogador" class="btn-secundario">
                 Trocar jogador
             </button>
 
         </header>
 
 
-        <!-- PAINEL -->
+        <!-- INFORMAÇÕES -->
 
         <section class="painel">
 
-            <div class="status-bar">
+            <div class="info-box">
+                <span>🏆 Pontos</span>
+                <strong id="saldo">100</strong>
+            </div>
 
-                <div class="status">
-                    <span>🏆 Pontos</span>
+            <div class="info-box">
+                <span>🔥 Multiplicador</span>
+                <strong id="multiplicador">1.0x</strong>
+            </div>
 
-                    <strong id="saldo">
-                        100
-                    </strong>
-                </div>
+            <div class="info-box">
+                <span>⭐ Pontos da rodada</span>
+                <strong id="lucroAtual">0</strong>
+            </div>
 
-
-                <div class="status">
-                    <span>⚡ Multiplicador</span>
-
-                    <strong id="multiplicador">
-                        x1.0
-                    </strong>
-                </div>
+        </section>
 
 
-                <div class="status">
-                    <span>💎 Pontos da rodada</span>
+        <!-- CONFIGURAÇÕES -->
 
-                    <strong id="lucroAtual">
-                        0
-                    </strong>
-                </div>
+        <section class="configuracao">
+
+            <div class="config-item">
+
+                <label for="qtdMinas">
+                    💣 Minas
+                </label>
+
+                <select id="qtdMinas">
+
+                    <option value="3">3 minas</option>
+                    <option value="5" selected>5 minas</option>
+                    <option value="7">7 minas</option>
+                    <option value="9">9 minas</option>
+
+                </select>
 
             </div>
 
 
-            <div class="divisor"></div>
+            <div class="config-item">
 
+                <label for="tamanhoTabuleiro">
+                    🧩 Tabuleiro
+                </label>
 
-            <!-- CONTROLES -->
+                <select id="tamanhoTabuleiro">
 
-            <div class="controles">
+                    <option value="5">5 x 5</option>
+                    <option value="6" selected>6 x 6</option>
+                    <option value="7">7 x 7</option>
 
-                <div class="campo-grupo">
-
-                    <label for="qtdMinas">
-                        ☠️ Minas
-                    </label>
-
-                    <select id="qtdMinas">
-
-                        <option value="3">
-                            3
-                        </option>
-
-                        <option value="5" selected>
-                            5
-                        </option>
-
-                        <option value="7">
-                            7
-                        </option>
-
-                        <option value="9">
-                            9
-                        </option>
-
-                    </select>
-
-                </div>
-
-
-                <div class="campo-grupo">
-
-                    <label for="tamanhoTabuleiro">
-                        🏛️ Tabuleiro
-                    </label>
-
-                    <select id="tamanhoTabuleiro">
-
-                        <option value="5">
-                            5 x 5
-                        </option>
-
-                        <option value="6" selected>
-                            6 x 6
-                        </option>
-
-                        <option value="7">
-                            7 x 7
-                        </option>
-
-                    </select>
-
-                </div>
+                </select>
 
             </div>
 
 
-            <button
-                id="btnAcao"
-                class="btn-acao btn-apostar"
-            >
+            <button id="btnAcao" class="btn-acao">
                 ⚔️ COMEÇAR RODADA
             </button>
 
-
-            <p id="mensagem">
-                Encontre as relíquias e evite as minas!
-            </p>
-
         </section>
+
+
+        <!-- MENSAGEM -->
+
+        <div id="mensagem" class="mensagem">
+            Escolha as configurações e comece a rodada!
+        </div>
 
 
         <!-- TABULEIRO -->
 
-        <section id="grade-container">
+        <section class="area-tabuleiro">
 
-            <div id="grade"></div>
+            <div id="grade" class="grade"></div>
 
         </section>
+
+
+        <footer>
+
+            <p>
+                ⚔️ Arena de Ares — Jogo de demonstração
+            </p>
+
+            <p>
+                Use apenas dados fictícios durante os testes.
+            </p>
+
+        </footer>
 
     </main>
 
