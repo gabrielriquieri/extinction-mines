@@ -175,7 +175,8 @@ function clicarCasa(index) {
   if (casaClicada.innerHTML !== "") return;
 
   if (bombas.includes(index)) {
-    casaClicada.textContent = "💀";
+    // Revela a bomba como caveira
+    casaClicada.innerHTML = "💀";
     casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-bomba", "explosao-unica");
     criarEfeitoExplosao(casaClicada);
@@ -183,8 +184,8 @@ function clicarCasa(index) {
 
     finalizarJogo(false);
   } else {
-    // Revela a coroa no lugar de imagens aleatórias
-    casaClicada.textContent = "👑";
+    // Revela a casa premiada sempre como Coroa
+    casaClicada.innerHTML = "👑";
     casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-reliquia");
     casaClicada.disabled = true;
@@ -216,13 +217,13 @@ function retirarLucro() {
   tocarSom("sons/vitoria.mp3");
 
   elementoMensagem.style.color = "#ffd700";
-  elementoMensagem.textContent = `🏛️ Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
+  elementoMensagem.textContent = `🏛️️ Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
 
   const casas = document.querySelectorAll(".casa");
   casas.forEach((casa, idx) => {
     casa.disabled = true;
     if (bombas.includes(idx)) {
-      casa.textContent = "💀";
+      casa.innerHTML = "💀";
       casa.style.fontSize = "30px";
       casa.classList.add("revelado-bomba", "chacoalhar-bomba");
     }
@@ -259,7 +260,7 @@ function finalizarJogo(vitoria) {
     casas.forEach((casa, idx) => {
       casa.disabled = true;
       if (bombas.includes(idx) && !casa.classList.contains("revelado-bomba")) {
-        casa.textContent = "💀";
+        casa.innerHTML = "💀";
         casa.style.fontSize = "30px";
         casa.classList.add("revelado-bomba");
       }
