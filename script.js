@@ -60,12 +60,13 @@ formCadastro.addEventListener("submit", function (event) {
     const senhaValor = senha.value;
 
     /* -------------------------
-       VALIDAR EMAIL
+       VALIDAR EMAIL (DOMÍNIOS PERMITIDOS)
     ------------------------- */
-    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Aceita: hotmail, gmail, icloud, yahoo e outlook (com ou sem .br no final)
+    const emailValido = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|icloud|yahoo|outlook)\.com(\.br)?$/i;
 
     if (!emailValido.test(emailValor)) {
-        erroCadastro.textContent = "Digite um e-mail válido.";
+        erroCadastro.textContent = "Use um e-mail válido (@gmail, @hotmail, @icloud, @yahoo ou @outlook).";
         email.focus();
         return;
     }
