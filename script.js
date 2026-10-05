@@ -1,11 +1,12 @@
-/* =================================
+/* =========================================
    ARENA DE ARES
-================================= */
+   JOGO DE DEMONSTRAÇÃO
+========================================= */
 
 
-/* =================================
-   VARIÁVEIS
-================================= */
+/* =========================================
+   VARIÁVEIS DO JOGADOR
+========================================= */
 
 let pontos = 100;
 
@@ -24,9 +25,9 @@ let dimensao = 6;
 let quantidadeMinas = 5;
 
 
-/* =================================
-   ELEMENTOS
-================================= */
+/* =========================================
+   ELEMENTOS DO CADASTRO
+========================================= */
 
 const telaCadastro =
     document.getElementById("telaCadastro");
@@ -37,17 +38,11 @@ const formCadastro =
 const nomeUsuario =
     document.getElementById("nomeUsuario");
 
-const nomeCompleto =
-    document.getElementById("nomeCompleto");
-
-const email =
-    document.getElementById("email");
-
 const telefone =
     document.getElementById("telefone");
 
-const cpf =
-    document.getElementById("cpf");
+const email =
+    document.getElementById("email");
 
 const senha =
     document.getElementById("senha");
@@ -58,6 +53,14 @@ const confirmarSenha =
 const erroCadastro =
     document.getElementById("erroCadastro");
 
+
+/* =========================================
+   ELEMENTOS DO JOGO
+========================================= */
+
+const jogo =
+    document.getElementById("jogo");
+
 const jogador =
     document.getElementById("jogador");
 
@@ -67,7 +70,7 @@ const saldo =
 const grade =
     document.getElementById("grade");
 
-const multiplicadorHTML =
+const multiplicadorTexto =
     document.getElementById("multiplicador");
 
 const lucroAtual =
@@ -88,340 +91,291 @@ const tamanhoTabuleiro =
 const btnTrocarJogador =
     document.getElementById("btnTrocarJogador");
 
-const fagulhasContainer =
-    document.getElementById("fagulhas-container");
 
+/* =========================================
+   MÁSCARA DE TELEFONE
+========================================= */
 
-/* =================================
-   MÁSCARA DO TELEFONE
-================================= */
+telefone.addEventListener("input", function () {
 
-telefone.addEventListener(
-    "input",
-    function () {
+    let valor = telefone.value.replace(/\D/g, "");
 
-        let valor =
-            telefone.value.replace(/\D/g, "");
+    valor = valor.substring(0, 11);
 
-        valor =
-            valor.substring(0, 11);
+    if (valor.length <= 10) {
 
-        if (valor.length <= 10) {
-
-            valor =
-                valor.replace(
-                    /^(\d{2})(\d)/,
-                    "($1) $2"
-                );
-
-            valor =
-                valor.replace(
-                    /(\d{4})(\d)/,
-                    "$1-$2"
-                );
-
-        } else {
-
-            valor =
-                valor.replace(
-                    /^(\d{2})(\d)/,
-                    "($1) $2"
-                );
-
-            valor =
-                valor.replace(
-                    /(\d{5})(\d)/,
-                    "$1-$2"
-                );
-        }
-
-        telefone.value = valor;
-
-    }
-);
-
-
-/* =================================
-   MÁSCARA DO CPF
-================================= */
-
-cpf.addEventListener(
-    "input",
-    function () {
-
-        let valor =
-            cpf.value.replace(/\D/g, "");
-
-        valor =
-            valor.substring(0, 11);
-
-        valor =
-            valor.replace(
-                /(\d{3})(\d)/,
-                "$1.$2"
-            );
-
-        valor =
-            valor.replace(
-                /(\d{3})(\d)/,
-                "$1.$2"
-            );
-
-        valor =
-            valor.replace(
-                /(\d{3})(\d{1,2})$/,
-                "$1-$2"
-            );
-
-        cpf.value = valor;
-
-    }
-);
-
-
-/* =================================
-   CADASTRO
-================================= */
-
-function verificarCadastro() {
-
-    const nomeSalvo =
-        localStorage.getItem(
-            "nomeJogador"
+        valor = valor.replace(
+            /^(\d{2})(\d)/,
+            "($1) $2"
         );
 
-    if (nomeSalvo) {
-
-        jogador.textContent =
-            `⚔️ Guerreiro: ${nomeSalvo}`;
-
-        telaCadastro.classList.add(
-            "escondido"
+        valor = valor.replace(
+            /(\d{4})(\d)/,
+            "$1-$2"
         );
 
     } else {
 
-        telaCadastro.classList.remove(
-            "escondido"
+        valor = valor.replace(
+            /^(\d{2})(\d)/,
+            "($1) $2"
+        );
+
+        valor = valor.replace(
+            /(\d{5})(\d)/,
+            "$1-$2"
         );
     }
+
+    telefone.value = valor;
+
+});
+
+
+/* =========================================
+   CADASTRO
+========================================= */
+
+formCadastro.addEventListener("submit", function (event) {
+
+    event.preventDefault();
+
+    erroCadastro.textContent = "";
+
+
+    const usuario =
+        nomeUsuario.value.trim();
+
+    const emailValor =
+        email.value.trim();
+
+    const telefoneValor =
+        telefone.value.trim();
+
+    const senhaValor =
+        senha.value;
+
+    const confirmarValor =
+        confirmarSenha.value;
+
+
+    /* -------------------------
+       VALIDAR USUÁRIO
+    ------------------------- */
+
+    if (usuario.length < 3) {
+
+        erroCadastro.textContent =
+            "O nome de usuário precisa ter pelo menos 3 caracteres.";
+
+        nomeUsuario.focus();
+
+        return;
+    }
+
+
+    /* -------------------------
+       VALIDAR TELEFONE
+    ------------------------- */
+
+    const telefoneNumeros =
+        telefoneValor.replace(/\D/g, "");
+
+    if (telefoneNumeros.length < 10) {
+
+        erroCadastro.textContent =
+            "Digite um número de telefone válido.";
+
+        telefone.focus();
+
+        return;
+    }
+
+
+    /* -------------------------
+       VALIDAR EMAIL
+    ------------------------- */
+
+    const emailValido =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailValido.test(emailValor)) {
+
+        erroCadastro.textContent =
+            "Digite um e-mail válido.";
+
+        email.focus();
+
+        return;
+    }
+
+
+    /* -------------------------
+       VALIDAR SENHA
+    ------------------------- */
+
+    if (senhaValor.length < 6) {
+
+        erroCadastro.textContent =
+            "A senha precisa ter pelo menos 6 caracteres.";
+
+        senha.focus();
+
+        return;
+    }
+
+
+    /* -------------------------
+       CONFIRMAR SENHA
+    ------------------------- */
+
+    if (senhaValor !== confirmarValor) {
+
+        erroCadastro.textContent =
+            "As senhas não são iguais.";
+
+        confirmarSenha.focus();
+
+        return;
+    }
+
+
+    /* =================================
+       ENTRAR NO JOGO
+       
+       SOMENTE O NOME DE USUÁRIO
+       É SALVO LOCALMENTE.
+       
+       TELEFONE, EMAIL E SENHA
+       NÃO SÃO SALVOS.
+    ================================= */
+
+    localStorage.setItem(
+        "nomeJogador",
+        usuario
+    );
+
+
+    jogador.textContent =
+        `⚔️ Guerreiro: ${usuario}`;
+
+
+    telaCadastro.classList.add("escondido");
+
+    jogo.classList.remove("escondido");
+
+
+    mensagem.textContent =
+        "Escolha as configurações e comece a rodada!";
+
+
+    atualizarInterface();
+
+});
+
+
+/* =========================================
+   VERIFICAR JOGADOR SALVO
+========================================= */
+
+function verificarJogador() {
+
+    const jogadorSalvo =
+        localStorage.getItem("nomeJogador");
+
+
+    if (jogadorSalvo) {
+
+        jogador.textContent =
+            `⚔️ Guerreiro: ${jogadorSalvo}`;
+
+        telaCadastro.classList.add("escondido");
+
+        jogo.classList.remove("escondido");
+
+        atualizarInterface();
+
+    } else {
+
+        telaCadastro.classList.remove("escondido");
+
+        jogo.classList.add("escondido");
+
+    }
+
 }
 
 
-/* =================================
-   ENVIAR CADASTRO
-================================= */
-
-formCadastro.addEventListener(
-    "submit",
-    function (event) {
-
-        event.preventDefault();
-
-
-        const usuario =
-            nomeUsuario.value.trim();
-
-        const nome =
-            nomeCompleto.value.trim();
-
-        const emailValor =
-            email.value.trim();
-
-        const telefoneValor =
-            telefone.value.trim();
-
-        const cpfValor =
-            cpf.value.trim();
-
-        const senhaValor =
-            senha.value;
-
-        const confirmarValor =
-            confirmarSenha.value;
-
-
-        /* NOME DE USUÁRIO */
-
-        if (usuario.length < 3) {
-
-            erroCadastro.textContent =
-                "O nome de usuário precisa ter pelo menos 3 caracteres.";
-
-            return;
-        }
-
-
-        /* NOME */
-
-        if (nome.length < 2) {
-
-            erroCadastro.textContent =
-                "Digite seu nome.";
-
-            return;
-        }
-
-
-        /* E-MAIL */
-
-        if (
-            !emailValor.includes("@")
-        ) {
-
-            erroCadastro.textContent =
-                "Digite um e-mail válido.";
-
-            return;
-        }
-
-
-        /* TELEFONE */
-
-        const telefoneNumeros =
-            telefoneValor.replace(
-                /\D/g,
-                ""
-            );
-
-        if (
-            telefoneNumeros.length < 10
-        ) {
-
-            erroCadastro.textContent =
-                "Digite um número de telefone válido.";
-
-            return;
-        }
-
-
-        /* CPF */
-
-        const cpfNumeros =
-            cpfValor.replace(
-                /\D/g,
-                ""
-            );
-
-        if (
-            cpfNumeros.length !== 11
-        ) {
-
-            erroCadastro.textContent =
-                "Digite um CPF de demonstração com 11 números.";
-
-            return;
-        }
-
-
-        /* SENHA */
-
-        if (
-            senhaValor.length < 6
-        ) {
-
-            erroCadastro.textContent =
-                "A senha precisa ter pelo menos 6 caracteres.";
-
-            return;
-        }
-
-
-        /* CONFIRMAR SENHA */
-
-        if (
-            senhaValor !== confirmarValor
-        ) {
-
-            erroCadastro.textContent =
-                "As senhas não são iguais.";
-
-            return;
-        }
-
-
-        /*
-         * IMPORTANTE:
-         * Não salvamos CPF, telefone,
-         * e-mail ou senha.
-         */
-
-        localStorage.setItem(
-            "nomeJogador",
-            usuario
-        );
-
-
-        jogador.textContent =
-            `⚔️ Guerreiro: ${usuario}`;
-
-
-        erroCadastro.textContent = "";
-
-
-        telaCadastro.classList.add(
-            "escondido"
-        );
-
-    }
-);
-
-
-/* =================================
+/* =========================================
    TROCAR JOGADOR
-================================= */
+========================================= */
 
 btnTrocarJogador.addEventListener(
     "click",
     function () {
 
-        localStorage.removeItem(
-            "nomeJogador"
-        );
+        localStorage.removeItem("nomeJogador");
 
         formCadastro.reset();
 
         erroCadastro.textContent = "";
 
-        telaCadastro.classList.remove(
-            "escondido"
-        );
+        jogo.classList.add("escondido");
+
+        telaCadastro.classList.remove("escondido");
 
     }
 );
 
 
-/* =================================
-   ATUALIZAR PAINEL
-================================= */
+/* =========================================
+   ATUALIZAR INTERFACE
+========================================= */
 
-function atualizarPainel() {
+function atualizarInterface() {
 
     saldo.textContent =
-        Math.floor(pontos);
+        pontos;
 
-    multiplicadorHTML.textContent =
-        `x${multiplicador.toFixed(1)}`;
-
-
-    const pontosRodada =
-        Math.floor(
-            acertos *
-            multiplicador *
-            5
-        );
-
+    multiplicadorTexto.textContent =
+        multiplicador.toFixed(1) + "x";
 
     lucroAtual.textContent =
-        pontosRodada;
+        acertos;
+
 }
 
 
-/* =================================
-   CRIAR TABULEIRO
-================================= */
+/* =========================================
+   ALTERAR TAMANHO DO TABULEIRO
+========================================= */
 
-function criarGrade() {
+tamanhoTabuleiro.addEventListener(
+    "change",
+    function () {
+
+        if (emJogo) {
+
+            mensagem.textContent =
+                "Termine a rodada antes de mudar o tabuleiro.";
+
+            return;
+        }
+
+        dimensao =
+            Number(tamanhoTabuleiro.value);
+
+        criarTabuleiroVazio();
+
+    }
+);
+
+
+/* =========================================
+   CRIAR TABULEIRO VAZIO
+========================================= */
+
+function criarTabuleiroVazio() {
 
     grade.innerHTML = "";
 
@@ -429,122 +383,72 @@ function criarGrade() {
         `repeat(${dimensao}, 1fr)`;
 
 
-    const totalCasas =
+    const total =
         dimensao * dimensao;
 
 
-    for (
-        let i = 0;
-        i < totalCasas;
-        i++
-    ) {
+    for (let i = 0; i < total; i++) {
 
         const casa =
-            document.createElement(
-                "button"
-            );
+            document.createElement("button");
 
+        casa.classList.add("casa");
 
-        casa.classList.add(
-            "casa"
-        );
-
-
-        casa.dataset.index = i;
+        casa.type = "button";
 
         casa.textContent = "?";
 
         casa.disabled = true;
 
-
-        casa.addEventListener(
-            "click",
-            function () {
-
-                clicarCasa(
-                    i,
-                    casa
-                );
-
-            }
-        );
-
-
         grade.appendChild(casa);
+
     }
+
 }
 
 
-/* =================================
-   GERAR MINAS
-================================= */
+/* =========================================
+   COMEÇAR RODADA
+========================================= */
 
-function gerarBombas() {
+btnAcao.addEventListener(
+    "click",
+    iniciarJogo
+);
 
-    bombas = [];
-
-
-    const totalCasas =
-        dimensao * dimensao;
-
-
-    while (
-        bombas.length <
-        quantidadeMinas
-    ) {
-
-        const numero =
-            Math.floor(
-                Math.random() *
-                totalCasas
-            );
-
-
-        if (
-            !bombas.includes(numero)
-        ) {
-
-            bombas.push(numero);
-        }
-    }
-}
-
-
-/* =================================
-   COMEÇAR JOGO
-================================= */
 
 function iniciarJogo() {
+
+    if (emJogo) {
+
+        mensagem.textContent =
+            "Você já está em uma rodada.";
+
+        return;
+    }
+
 
     if (pontos <= 0) {
 
         mensagem.textContent =
-            "Você ficou sem pontos.";
+            "Você não possui pontos suficientes para começar.";
 
         return;
     }
 
 
     quantidadeMinas =
-        parseInt(
-            qtdMinas.value
-        );
-
+        Number(qtdMinas.value);
 
     dimensao =
-        parseInt(
-            tamanhoTabuleiro.value
-        );
+        Number(tamanhoTabuleiro.value);
 
 
     const totalCasas =
         dimensao * dimensao;
 
 
-    if (
-        quantidadeMinas >=
-        totalCasas
-    ) {
+    if (quantidadeMinas >= totalCasas) {
 
         mensagem.textContent =
             "A quantidade de minas é muito alta.";
@@ -553,8 +457,14 @@ function iniciarJogo() {
     }
 
 
-    gerarBombas();
+    /* Gasta 1 ponto para começar */
 
+    pontos -= 1;
+
+
+    emJogo = true;
+
+    bombas = [];
 
     casasClicadas = [];
 
@@ -562,64 +472,95 @@ function iniciarJogo() {
 
     multiplicador = 1.0;
 
-    emJogo = true;
+
+    /* Criar minas */
+
+    while (
+        bombas.length < quantidadeMinas
+    ) {
+
+        const numero =
+            Math.floor(
+                Math.random() * totalCasas
+            );
+
+        if (!bombas.includes(numero)) {
+
+            bombas.push(numero);
+
+        }
+
+    }
 
 
-    pontos--;
+    criarTabuleiro();
 
 
     btnAcao.textContent =
-        "🏆 FINALIZAR RODADA";
-
-
-    btnAcao.classList.remove(
-        "btn-apostar"
-    );
-
-
-    btnAcao.classList.add(
-        "btn-retirar"
-    );
-
-
-    qtdMinas.disabled = true;
-
-    tamanhoTabuleiro.disabled = true;
+        "🏳️ ENCERRAR RODADA";
 
 
     mensagem.textContent =
         "Escolha uma casa da arena!";
 
 
-    atualizarPainel();
+    atualizarInterface();
 
-    criarGrade();
-
-
-    const casas =
-        document.querySelectorAll(
-            ".casa"
-        );
-
-
-    casas.forEach(
-        function (casa) {
-
-            casa.disabled = false;
-
-        }
-    );
 }
 
 
-/* =================================
-   CLICAR CASA
-================================= */
+/* =========================================
+   CRIAR TABULEIRO
+========================================= */
 
-function clicarCasa(
-    index,
-    elemento
-) {
+function criarTabuleiro() {
+
+    grade.innerHTML = "";
+
+    grade.style.gridTemplateColumns =
+        `repeat(${dimensao}, 1fr)`;
+
+
+    const total =
+        dimensao * dimensao;
+
+
+    for (let i = 0; i < total; i++) {
+
+        const casa =
+            document.createElement("button");
+
+        casa.classList.add("casa");
+
+        casa.type = "button";
+
+        casa.dataset.index = i;
+
+        casa.textContent = "?";
+
+
+        casa.addEventListener(
+            "click",
+            function () {
+
+                clicarCasa(i, casa);
+
+            }
+        );
+
+
+        grade.appendChild(casa);
+
+    }
+
+}
+
+
+/* =========================================
+   CLICAR EM CASA
+========================================= */
+
+function clicarCasa(indice, casa) {
 
     if (!emJogo) {
         return;
@@ -627,299 +568,193 @@ function clicarCasa(
 
 
     if (
-        casasClicadas.includes(index)
+        casasClicadas.includes(indice)
     ) {
-
         return;
     }
 
 
-    casasClicadas.push(index);
+    casasClicadas.push(indice);
 
 
-    /* MINA */
+    /* =========================
+       BOMBA
+    ========================== */
 
-    if (
-        bombas.includes(index)
-    ) {
+    if (bombas.includes(indice)) {
 
-        elemento.textContent =
-            "💀";
+        casa.textContent = "💣";
 
-
-        elemento.classList.add(
-            "revelado-bomba"
-        );
-
-
-        mensagem.textContent =
-            "💥 Você encontrou uma mina!";
-
+        casa.classList.add("bomba");
 
         revelarBombas();
 
+        emJogo = false;
 
-        finalizarJogo(false);
+        btnAcao.textContent =
+            "⚔️ COMEÇAR RODADA";
 
+        mensagem.textContent =
+            "💥 Você encontrou uma mina! A rodada terminou.";
+
+        multiplicador = 1.0;
+
+        atualizarInterface();
 
         return;
     }
 
 
-    /* RELÍQUIA */
-
-    elemento.textContent =
-        "👑";
-
-
-    elemento.classList.add(
-        "revelado-reliquia"
-    );
-
-
-    elemento.disabled = true;
-
+    /* =========================
+       CASA SEGURA
+    ========================== */
 
     acertos++;
 
-    multiplicador += 0.5;
+    multiplicador += 0.2;
+
+
+    casa.textContent = "⚔️";
+
+    casa.classList.add("segura");
+
+    casa.classList.add("desativada");
+
+
+    /* Cada acerto gera pontos */
+
+    pontos += 1;
 
 
     mensagem.textContent =
-        "👑 Relíquia encontrada! Continue.";
+        `⚔️ Acerto! Você encontrou uma casa segura.`;
 
 
-    atualizarPainel();
+    atualizarInterface();
 
+
+    /* =========================
+       VERIFICAR VITÓRIA
+    ========================== */
 
     const totalCasas =
         dimensao * dimensao;
 
 
-    const casasSeguras =
-        totalCasas -
-        quantidadeMinas;
-
-
     if (
-        acertos >= casasSeguras
+        acertos >=
+        totalCasas - quantidadeMinas
     ) {
 
-        finalizarJogo(true);
+        finalizarVitoria();
+
     }
+
 }
 
 
-/* =================================
-   REVELAR MINAS
-================================= */
+/* =========================================
+   REVELAR BOMBAS
+========================================= */
 
 function revelarBombas() {
 
     const casas =
-        document.querySelectorAll(
-            ".casa"
-        );
+        document.querySelectorAll(".casa");
 
 
-    bombas.forEach(
-        function (index) {
+    bombas.forEach(function (indice) {
 
-            const casa =
-                casas[index];
+        const casa =
+            casas[indice];
 
-
-            if (!casa) {
-                return;
-            }
-
-
-            casa.textContent =
-                "💣";
-
-
-            casa.classList.add(
-                "revelado-bomba"
-            );
-
+        if (!casa) {
+            return;
         }
-    );
+
+        casa.textContent = "💣";
+
+        casa.classList.add("bomba");
+
+        casa.classList.add("desativada");
+
+    });
+
 }
 
 
-/* =================================
-   FINALIZAR JOGO
-================================= */
+/* =========================================
+   VITÓRIA
+========================================= */
 
-function finalizarJogo(vitoria) {
+function finalizarVitoria() {
 
     emJogo = false;
 
 
-    const ganho =
+    const bonus =
         Math.floor(
-            acertos *
-            multiplicador *
-            5
+            multiplicador
         );
 
 
-    if (vitoria) {
-
-        pontos += ganho;
-
-
-        mensagem.textContent =
-            `🏆 Vitória! Você ganhou ${ganho} pontos.`;
-
-    } else {
-
-        mensagem.textContent =
-            "💀 Você perdeu a rodada.";
-
-    }
-
-
-    atualizarPainel();
-
-
-    qtdMinas.disabled = false;
-
-    tamanhoTabuleiro.disabled = false;
+    pontos += bonus;
 
 
     btnAcao.textContent =
         "⚔️ COMEÇAR RODADA";
 
 
-    btnAcao.classList.remove(
-        "btn-retirar"
-    );
+    mensagem.textContent =
+        `🏆 VITÓRIA! Você encontrou todas as casas seguras e ganhou ${bonus} ponto(s) de bônus.`;
 
 
-    btnAcao.classList.add(
-        "btn-apostar"
-    );
+    revelarBombas();
 
+    atualizarInterface();
 
-    setTimeout(
-        function () {
-
-            acertos = 0;
-
-            multiplicador = 1.0;
-
-            lucroAtual.textContent =
-                "0";
-
-            criarGrade();
-
-            atualizarPainel();
-
-        },
-        2000
-    );
 }
 
 
-/* =================================
-   BOTÃO PRINCIPAL
-================================= */
+/* =========================================
+   BOTÃO DE ENCERRAR RODADA
+========================================= */
 
 btnAcao.addEventListener(
-    "click",
+    "dblclick",
     function () {
 
         if (!emJogo) {
-
-            iniciarJogo();
-
-        } else {
-
-            finalizarJogo(true);
-
-        }
-
-    }
-);
-
-
-/* =================================
-   MUDAR TABULEIRO
-================================= */
-
-tamanhoTabuleiro.addEventListener(
-    "change",
-    function () {
-
-        if (emJogo) {
             return;
         }
 
 
-        dimensao =
-            parseInt(
-                tamanhoTabuleiro.value
-            );
+        emJogo = false;
 
 
-        criarGrade();
+        revelarBombas();
+
+
+        btnAcao.textContent =
+            "⚔️ COMEÇAR RODADA";
+
+
+        mensagem.textContent =
+            "🏳️ Rodada encerrada.";
+
+
+        atualizarInterface();
 
     }
 );
 
 
-/* =================================
-   FAGULHAS
-================================= */
+/* =========================================
+   INICIALIZAÇÃO
+========================================= */
 
-function gerarFagulhasFundo() {
+verificarJogador();
 
-    for (
-        let i = 0;
-        i < 35;
-        i++
-    ) {
+criarTabuleiroVazio();
 
-        const fagulha =
-            document.createElement(
-                "div"
-            );
-
-
-        fagulha.classList.add(
-            "fagulha"
-        );
-
-
-        fagulha.style.left =
-            `${Math.random() * 100}%`;
-
-
-        fagulha.style.animationDelay =
-            `${Math.random() * 6}s`;
-
-
-        fagulha.style.animationDuration =
-            `${3 + Math.random() * 5}s`;
-
-
-        fagulhasContainer.appendChild(
-            fagulha
-        );
-
-    }
-}
-
-
-/* =================================
-   INICIAR
-================================= */
-
-verificarCadastro();
-
-criarGrade();
-
-atualizarPainel();
-
-gerarFagulhasFundo();
+atualizarInterface();
