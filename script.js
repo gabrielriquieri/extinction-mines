@@ -1,12 +1,11 @@
-/* =========================================
+/* =================================
    ARENA DE ARES
-   JOGO DE PONTOS
-========================================= */
+================================= */
 
 
-/* =========================================
+/* =================================
    VARIÁVEIS
-========================================= */
+================================= */
 
 let pontos = 100;
 
@@ -20,14 +19,14 @@ let acertos = 0;
 
 let multiplicador = 1.0;
 
-let dimensao = 5;
+let dimensao = 6;
 
 let quantidadeMinas = 5;
 
 
-/* =========================================
-   ELEMENTOS HTML
-========================================= */
+/* =================================
+   ELEMENTOS
+================================= */
 
 const telaCadastro =
     document.getElementById("telaCadastro");
@@ -35,8 +34,26 @@ const telaCadastro =
 const formCadastro =
     document.getElementById("formCadastro");
 
-const nomeJogador =
-    document.getElementById("nomeJogador");
+const nomeUsuario =
+    document.getElementById("nomeUsuario");
+
+const nomeCompleto =
+    document.getElementById("nomeCompleto");
+
+const email =
+    document.getElementById("email");
+
+const telefone =
+    document.getElementById("telefone");
+
+const cpf =
+    document.getElementById("cpf");
+
+const senha =
+    document.getElementById("senha");
+
+const confirmarSenha =
+    document.getElementById("confirmarSenha");
 
 const erroCadastro =
     document.getElementById("erroCadastro");
@@ -75,14 +92,103 @@ const fagulhasContainer =
     document.getElementById("fagulhas-container");
 
 
-/* =========================================
+/* =================================
+   MÁSCARA DO TELEFONE
+================================= */
+
+telefone.addEventListener(
+    "input",
+    function () {
+
+        let valor =
+            telefone.value.replace(/\D/g, "");
+
+        valor =
+            valor.substring(0, 11);
+
+        if (valor.length <= 10) {
+
+            valor =
+                valor.replace(
+                    /^(\d{2})(\d)/,
+                    "($1) $2"
+                );
+
+            valor =
+                valor.replace(
+                    /(\d{4})(\d)/,
+                    "$1-$2"
+                );
+
+        } else {
+
+            valor =
+                valor.replace(
+                    /^(\d{2})(\d)/,
+                    "($1) $2"
+                );
+
+            valor =
+                valor.replace(
+                    /(\d{5})(\d)/,
+                    "$1-$2"
+                );
+        }
+
+        telefone.value = valor;
+
+    }
+);
+
+
+/* =================================
+   MÁSCARA DO CPF
+================================= */
+
+cpf.addEventListener(
+    "input",
+    function () {
+
+        let valor =
+            cpf.value.replace(/\D/g, "");
+
+        valor =
+            valor.substring(0, 11);
+
+        valor =
+            valor.replace(
+                /(\d{3})(\d)/,
+                "$1.$2"
+            );
+
+        valor =
+            valor.replace(
+                /(\d{3})(\d)/,
+                "$1.$2"
+            );
+
+        valor =
+            valor.replace(
+                /(\d{3})(\d{1,2})$/,
+                "$1-$2"
+            );
+
+        cpf.value = valor;
+
+    }
+);
+
+
+/* =================================
    CADASTRO
-========================================= */
+================================= */
 
 function verificarCadastro() {
 
     const nomeSalvo =
-        localStorage.getItem("nomeJogador");
+        localStorage.getItem(
+            "nomeJogador"
+        );
 
     if (nomeSalvo) {
 
@@ -98,10 +204,13 @@ function verificarCadastro() {
         telaCadastro.classList.remove(
             "escondido"
         );
-
     }
 }
 
+
+/* =================================
+   ENVIAR CADASTRO
+================================= */
 
 formCadastro.addEventListener(
     "submit",
@@ -109,26 +218,146 @@ formCadastro.addEventListener(
 
         event.preventDefault();
 
-        const nome =
-            nomeJogador.value.trim();
 
-        if (nome.length < 2) {
+        const usuario =
+            nomeUsuario.value.trim();
+
+        const nome =
+            nomeCompleto.value.trim();
+
+        const emailValor =
+            email.value.trim();
+
+        const telefoneValor =
+            telefone.value.trim();
+
+        const cpfValor =
+            cpf.value.trim();
+
+        const senhaValor =
+            senha.value;
+
+        const confirmarValor =
+            confirmarSenha.value;
+
+
+        /* NOME DE USUÁRIO */
+
+        if (usuario.length < 3) {
 
             erroCadastro.textContent =
-                "Digite pelo menos 2 caracteres.";
+                "O nome de usuário precisa ter pelo menos 3 caracteres.";
 
             return;
         }
 
+
+        /* NOME */
+
+        if (nome.length < 2) {
+
+            erroCadastro.textContent =
+                "Digite seu nome.";
+
+            return;
+        }
+
+
+        /* E-MAIL */
+
+        if (
+            !emailValor.includes("@")
+        ) {
+
+            erroCadastro.textContent =
+                "Digite um e-mail válido.";
+
+            return;
+        }
+
+
+        /* TELEFONE */
+
+        const telefoneNumeros =
+            telefoneValor.replace(
+                /\D/g,
+                ""
+            );
+
+        if (
+            telefoneNumeros.length < 10
+        ) {
+
+            erroCadastro.textContent =
+                "Digite um número de telefone válido.";
+
+            return;
+        }
+
+
+        /* CPF */
+
+        const cpfNumeros =
+            cpfValor.replace(
+                /\D/g,
+                ""
+            );
+
+        if (
+            cpfNumeros.length !== 11
+        ) {
+
+            erroCadastro.textContent =
+                "Digite um CPF de demonstração com 11 números.";
+
+            return;
+        }
+
+
+        /* SENHA */
+
+        if (
+            senhaValor.length < 6
+        ) {
+
+            erroCadastro.textContent =
+                "A senha precisa ter pelo menos 6 caracteres.";
+
+            return;
+        }
+
+
+        /* CONFIRMAR SENHA */
+
+        if (
+            senhaValor !== confirmarValor
+        ) {
+
+            erroCadastro.textContent =
+                "As senhas não são iguais.";
+
+            return;
+        }
+
+
+        /*
+         * IMPORTANTE:
+         * Não salvamos CPF, telefone,
+         * e-mail ou senha.
+         */
+
         localStorage.setItem(
             "nomeJogador",
-            nome
+            usuario
         );
 
+
         jogador.textContent =
-            `⚔️ Guerreiro: ${nome}`;
+            `⚔️ Guerreiro: ${usuario}`;
+
 
         erroCadastro.textContent = "";
+
 
         telaCadastro.classList.add(
             "escondido"
@@ -138,9 +367,9 @@ formCadastro.addEventListener(
 );
 
 
-/* =========================================
+/* =================================
    TROCAR JOGADOR
-========================================= */
+================================= */
 
 btnTrocarJogador.addEventListener(
     "click",
@@ -150,7 +379,7 @@ btnTrocarJogador.addEventListener(
             "nomeJogador"
         );
 
-        nomeJogador.value = "";
+        formCadastro.reset();
 
         erroCadastro.textContent = "";
 
@@ -162,9 +391,9 @@ btnTrocarJogador.addEventListener(
 );
 
 
-/* =========================================
+/* =================================
    ATUALIZAR PAINEL
-========================================= */
+================================= */
 
 function atualizarPainel() {
 
@@ -174,18 +403,23 @@ function atualizarPainel() {
     multiplicadorHTML.textContent =
         `x${multiplicador.toFixed(1)}`;
 
+
     const pontosRodada =
-        Math.floor(acertos * multiplicador * 5);
+        Math.floor(
+            acertos *
+            multiplicador *
+            5
+        );
+
 
     lucroAtual.textContent =
         pontosRodada;
-
 }
 
 
-/* =========================================
+/* =================================
    CRIAR TABULEIRO
-========================================= */
+================================= */
 
 function criarGrade() {
 
@@ -194,8 +428,10 @@ function criarGrade() {
     grade.style.gridTemplateColumns =
         `repeat(${dimensao}, 1fr)`;
 
+
     const totalCasas =
         dimensao * dimensao;
+
 
     for (
         let i = 0;
@@ -204,9 +440,15 @@ function criarGrade() {
     ) {
 
         const casa =
-            document.createElement("button");
+            document.createElement(
+                "button"
+            );
 
-        casa.classList.add("casa");
+
+        casa.classList.add(
+            "casa"
+        );
+
 
         casa.dataset.index = i;
 
@@ -214,72 +456,85 @@ function criarGrade() {
 
         casa.disabled = true;
 
+
         casa.addEventListener(
             "click",
             function () {
 
-                clicarCasa(i, casa);
+                clicarCasa(
+                    i,
+                    casa
+                );
 
             }
         );
 
+
         grade.appendChild(casa);
     }
-
 }
 
 
-/* =========================================
+/* =================================
    GERAR MINAS
-========================================= */
+================================= */
 
 function gerarBombas() {
 
     bombas = [];
 
+
     const totalCasas =
         dimensao * dimensao;
 
+
     while (
-        bombas.length < quantidadeMinas
+        bombas.length <
+        quantidadeMinas
     ) {
 
         const numero =
             Math.floor(
-                Math.random() * totalCasas
+                Math.random() *
+                totalCasas
             );
 
-        if (!bombas.includes(numero)) {
+
+        if (
+            !bombas.includes(numero)
+        ) {
 
             bombas.push(numero);
-
         }
-
     }
-
 }
 
 
-/* =========================================
-   COMEÇAR RODADA
-========================================= */
+/* =================================
+   COMEÇAR JOGO
+================================= */
 
 function iniciarJogo() {
 
     if (pontos <= 0) {
 
         mensagem.textContent =
-            "Você ficou sem pontos. Recarregue a página para jogar novamente.";
+            "Você ficou sem pontos.";
 
         return;
     }
 
 
     quantidadeMinas =
-        parseInt(qtdMinas.value);
+        parseInt(
+            qtdMinas.value
+        );
+
 
     dimensao =
-        parseInt(tamanhoTabuleiro.value);
+        parseInt(
+            tamanhoTabuleiro.value
+        );
 
 
     const totalCasas =
@@ -287,7 +542,8 @@ function iniciarJogo() {
 
 
     if (
-        quantidadeMinas >= totalCasas
+        quantidadeMinas >=
+        totalCasas
     ) {
 
         mensagem.textContent =
@@ -298,6 +554,7 @@ function iniciarJogo() {
 
 
     gerarBombas();
+
 
     casasClicadas = [];
 
@@ -310,13 +567,15 @@ function iniciarJogo() {
 
     pontos--;
 
-    
+
     btnAcao.textContent =
         "🏆 FINALIZAR RODADA";
+
 
     btnAcao.classList.remove(
         "btn-apostar"
     );
+
 
     btnAcao.classList.add(
         "btn-retirar"
@@ -338,20 +597,24 @@ function iniciarJogo() {
 
 
     const casas =
-        document.querySelectorAll(".casa");
+        document.querySelectorAll(
+            ".casa"
+        );
 
-    casas.forEach(function (casa) {
 
-        casa.disabled = false;
+    casas.forEach(
+        function (casa) {
 
-    });
+            casa.disabled = false;
 
+        }
+    );
 }
 
 
-/* =========================================
+/* =================================
    CLICAR CASA
-========================================= */
+================================= */
 
 function clicarCasa(
     index,
@@ -368,7 +631,6 @@ function clicarCasa(
     ) {
 
         return;
-
     }
 
 
@@ -381,7 +643,9 @@ function clicarCasa(
         bombas.includes(index)
     ) {
 
-        elemento.textContent = "💀";
+        elemento.textContent =
+            "💀";
+
 
         elemento.classList.add(
             "revelado-bomba"
@@ -394,20 +658,24 @@ function clicarCasa(
 
         revelarBombas();
 
+
         finalizarJogo(false);
 
-        return;
 
+        return;
     }
 
 
     /* RELÍQUIA */
 
-    elemento.textContent = "👑";
+    elemento.textContent =
+        "👑";
+
 
     elemento.classList.add(
         "revelado-reliquia"
     );
+
 
     elemento.disabled = true;
 
@@ -424,13 +692,13 @@ function clicarCasa(
     atualizarPainel();
 
 
-    /* TODAS AS CASAS SEGURAS */
-
     const totalCasas =
         dimensao * dimensao;
 
+
     const casasSeguras =
-        totalCasas - quantidadeMinas;
+        totalCasas -
+        quantidadeMinas;
 
 
     if (
@@ -438,44 +706,50 @@ function clicarCasa(
     ) {
 
         finalizarJogo(true);
-
     }
-
 }
 
 
-/* =========================================
+/* =================================
    REVELAR MINAS
-========================================= */
+================================= */
 
 function revelarBombas() {
 
     const casas =
-        document.querySelectorAll(".casa");
-
-    bombas.forEach(function (index) {
-
-        const casa =
-            casas[index];
-
-        if (!casa) {
-            return;
-        }
-
-        casa.textContent = "💣";
-
-        casa.classList.add(
-            "revelado-bomba"
+        document.querySelectorAll(
+            ".casa"
         );
 
-    });
 
+    bombas.forEach(
+        function (index) {
+
+            const casa =
+                casas[index];
+
+
+            if (!casa) {
+                return;
+            }
+
+
+            casa.textContent =
+                "💣";
+
+
+            casa.classList.add(
+                "revelado-bomba"
+            );
+
+        }
+    );
 }
 
 
-/* =========================================
+/* =================================
    FINALIZAR JOGO
-========================================= */
+================================= */
 
 function finalizarJogo(vitoria) {
 
@@ -484,13 +758,16 @@ function finalizarJogo(vitoria) {
 
     const ganho =
         Math.floor(
-            acertos * multiplicador * 5
+            acertos *
+            multiplicador *
+            5
         );
 
 
     if (vitoria) {
 
         pontos += ganho;
+
 
         mensagem.textContent =
             `🏆 Vitória! Você ganhou ${ganho} pontos.`;
@@ -514,35 +791,40 @@ function finalizarJogo(vitoria) {
     btnAcao.textContent =
         "⚔️ COMEÇAR RODADA";
 
+
     btnAcao.classList.remove(
         "btn-retirar"
     );
+
 
     btnAcao.classList.add(
         "btn-apostar"
     );
 
 
-    setTimeout(function () {
+    setTimeout(
+        function () {
 
-        acertos = 0;
+            acertos = 0;
 
-        multiplicador = 1.0;
+            multiplicador = 1.0;
 
-        lucroAtual.textContent = "0";
+            lucroAtual.textContent =
+                "0";
 
-        criarGrade();
+            criarGrade();
 
-        atualizarPainel();
+            atualizarPainel();
 
-    }, 2000);
-
+        },
+        2000
+    );
 }
 
 
-/* =========================================
+/* =================================
    BOTÃO PRINCIPAL
-========================================= */
+================================= */
 
 btnAcao.addEventListener(
     "click",
@@ -562,9 +844,9 @@ btnAcao.addEventListener(
 );
 
 
-/* =========================================
-   TAMANHO DO TABULEIRO
-========================================= */
+/* =================================
+   MUDAR TABULEIRO
+================================= */
 
 tamanhoTabuleiro.addEventListener(
     "change",
@@ -574,10 +856,12 @@ tamanhoTabuleiro.addEventListener(
             return;
         }
 
+
         dimensao =
             parseInt(
                 tamanhoTabuleiro.value
             );
+
 
         criarGrade();
 
@@ -585,9 +869,9 @@ tamanhoTabuleiro.addEventListener(
 );
 
 
-/* =========================================
-   EFEITO DE FUNDO
-========================================= */
+/* =================================
+   FAGULHAS
+================================= */
 
 function gerarFagulhasFundo() {
 
@@ -598,33 +882,39 @@ function gerarFagulhasFundo() {
     ) {
 
         const fagulha =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
+
 
         fagulha.classList.add(
             "fagulha"
         );
 
+
         fagulha.style.left =
             `${Math.random() * 100}%`;
+
 
         fagulha.style.animationDelay =
             `${Math.random() * 6}s`;
 
+
         fagulha.style.animationDuration =
             `${3 + Math.random() * 5}s`;
+
 
         fagulhasContainer.appendChild(
             fagulha
         );
 
     }
-
 }
 
 
-/* =========================================
-   INICIALIZAÇÃO
-========================================= */
+/* =================================
+   INICIAR
+================================= */
 
 verificarCadastro();
 
