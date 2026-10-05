@@ -132,113 +132,42 @@ telefone.addEventListener("input", function () {
 });
 
 
-/* =========================================
-   CADASTRO
-========================================= */
-
 formCadastro.addEventListener("submit", function (event) {
-
     event.preventDefault();
 
     erroCadastro.textContent = "";
 
+    const emailValor = email.value.trim();
+    const senhaValor = senha.value;
 
-    const usuario =
-        nomeUsuario.value.trim();
-
-    const emailValor =
-        email.value.trim();
-
-    const telefoneValor =
-        telefone.value.trim();
-
-    const senhaValor =
-        senha.value;
-
-    const confirmarValor =
-        confirmarSenha.value;
-
-
-    /* -------------------------
-       VALIDAR USUÁRIO
-    ------------------------- */
-
-    if (usuario.length < 3) {
-
-        erroCadastro.textContent =
-            "O nome de usuário precisa ter pelo menos 3 caracteres.";
-
-        nomeUsuario.focus();
-
-        return;
-    }
-
-
-    /* -------------------------
-       VALIDAR TELEFONE
-    ------------------------- */
-
-    const telefoneNumeros =
-        telefoneValor.replace(/\D/g, "");
-
-    if (telefoneNumeros.length < 10) {
-
-        erroCadastro.textContent =
-            "Digite um número de telefone válido.";
-
-        telefone.focus();
-
-        return;
-    }
-
-
-    /* -------------------------
-       VALIDAR EMAIL
-    ------------------------- */
-
-    const emailValido =
-        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailValido.test(emailValor)) {
-
-        erroCadastro.textContent =
-            "Digite um e-mail válido.";
-
+        erroCadastro.textContent = "Digite um e-mail válido.";
         email.focus();
-
         return;
     }
-
-
-    /* -------------------------
-       VALIDAR SENHA
-    ------------------------- */
 
     if (senhaValor.length < 6) {
-
-        erroCadastro.textContent =
-            "A senha precisa ter pelo menos 6 caracteres.";
-
+        erroCadastro.textContent = "A senha precisa ter pelo menos 6 caracteres.";
         senha.focus();
-
         return;
     }
 
+    // Extrai a parte antes do @ para usar como apelido na arena
+    const usuario = emailValor.split("@")[0];
 
-    /* -------------------------
-       CONFIRMAR SENHA
-    ------------------------- */
+    localStorage.setItem("nomeJogador", usuario);
 
-    if (senhaValor !== confirmarValor) {
+    jogador.textContent = `⚔️ Guerreiro: ${usuario}`;
 
-        erroCadastro.textContent =
-            "As senhas não são iguais.";
+    telaCadastro.classList.add("escondido");
+    jogo.classList.remove("escondido");
 
-        confirmarSenha.focus();
+    mensagem.textContent = "Escolha as configurações e comece a rodada!";
 
-        return;
-    }
-
+    atualizarInterface();
+});
 
     /* =================================
        ENTRAR NO JOGO
