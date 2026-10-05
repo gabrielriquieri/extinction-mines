@@ -27,6 +27,7 @@ const formCadastro = document.getElementById("formCadastro");
 const email = document.getElementById("email");
 const senha = document.getElementById("senha");
 const erroCadastro = document.getElementById("erroCadastro");
+const btnGoogle = document.getElementById("btnGoogle");
 
 
 /* =========================================
@@ -62,7 +63,6 @@ formCadastro.addEventListener("submit", function (event) {
     /* -------------------------
        VALIDAR EMAIL (DOMÍNIOS PERMITIDOS)
     ------------------------- */
-    // Aceita: hotmail, gmail, icloud, yahoo e outlook (com ou sem .br no final)
     const emailValido = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|icloud|yahoo|outlook)\.com(\.br)?$/i;
 
     if (!emailValido.test(emailValor)) {
@@ -94,6 +94,24 @@ formCadastro.addEventListener("submit", function (event) {
 
     atualizarInterface();
 
+});
+
+
+/* =========================================
+   ENTRAR COM GOOGLE (PREENCHIMENTO AUTOMÁTICO)
+========================================= */
+
+btnGoogle.addEventListener("click", function () {
+    const emailSalvo = localStorage.getItem("nomeJogador");
+
+    if (emailSalvo) {
+        email.value = `${emailSalvo}@gmail.com`;
+    } else {
+        email.value = "gabriel.riquieri2011@gmail.com";
+    }
+
+    senha.value = "123456";
+    erroCadastro.textContent = "";
 });
 
 
