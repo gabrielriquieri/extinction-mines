@@ -1,358 +1,635 @@
-let saldo = 0;
-let valorAposta = 0;
+/* =========================================
+   ARENA DE ARES
+   JOGO DE PONTOS
+========================================= */
+
+
+/* =========================================
+   VARIÁVEIS
+========================================= */
+
+let pontos = 100;
+
 let emJogo = false;
+
 let bombas = [];
+
+let casasClicadas = [];
+
 let acertos = 0;
+
 let multiplicador = 1.0;
+
 let dimensao = 5;
 
-function tocarSom(caminho) {
-  try {
-    const audio = new Audio(caminho);
-    audio.play().catch(() => {});
-  } catch (e) {}
-}
+let quantidadeMinas = 5;
 
-const elementoSaldo = document.getElementById("saldo");
-const elementoGrade = document.getElementById("grade");
-const elementoMultiplicador = document.getElementById("multiplicador");
-const elementoLucroAtual = document.getElementById("lucroAtual");
-const btnAcao = document.getElementById("btnAcao");
-const elementoMensagem = document.getElementById("mensagem");
-const inputMinas = document.getElementById("qtdMinas");
-const inputAposta = document.getElementById("valorAposta");
-const modalGlitch = document.getElementById("modalGlitch");
 
-function exibirModalSaldo() {
-  modalGlitch.classList.add("ativo");
-  tocarSom("sons/erro.mp3");
-}
+/* =========================================
+   ELEMENTOS HTML
+========================================= */
 
-function fecharModalSaldo() {
-  modalGlitch.classList.remove("ativo");
-}
+const telaCadastro =
+    document.getElementById("telaCadastro");
 
-// Atualiza os limites do input de aposta com base no saldo atual
-function atualizarLimitesInputAposta() {
-  if (inputAposta) {
-    inputAposta.max = saldo;
-    // Se o valor digitado atualmente for maior que o saldo, reajusta para o saldo máximo
-    if (parseFloat(inputAposta.value) > saldo) {
-      inputAposta.value = saldo > 0 ? saldo : 0;
+const formCadastro =
+    document.getElementById("formCadastro");
+
+const nomeJogador =
+    document.getElementById("nomeJogador");
+
+const erroCadastro =
+    document.getElementById("erroCadastro");
+
+const jogador =
+    document.getElementById("jogador");
+
+const saldo =
+    document.getElementById("saldo");
+
+const grade =
+    document.getElementById("grade");
+
+const multiplicadorHTML =
+    document.getElementById("multiplicador");
+
+const lucroAtual =
+    document.getElementById("lucroAtual");
+
+const btnAcao =
+    document.getElementById("btnAcao");
+
+const mensagem =
+    document.getElementById("mensagem");
+
+const qtdMinas =
+    document.getElementById("qtdMinas");
+
+const tamanhoTabuleiro =
+    document.getElementById("tamanhoTabuleiro");
+
+const btnTrocarJogador =
+    document.getElementById("btnTrocarJogador");
+
+const fagulhasContainer =
+    document.getElementById("fagulhas-container");
+
+
+/* =========================================
+   CADASTRO
+========================================= */
+
+function verificarCadastro() {
+
+    const nomeSalvo =
+        localStorage.getItem("nomeJogador");
+
+    if (nomeSalvo) {
+
+        jogador.textContent =
+            `⚔️ Guerreiro: ${nomeSalvo}`;
+
+        telaCadastro.classList.add(
+            "escondido"
+        );
+
+    } else {
+
+        telaCadastro.classList.remove(
+            "escondido"
+        );
+
     }
-  }
 }
 
-// Evento para impedir que o usuário digite um valor maior que o saldo em tempo real
-if (inputAposta) {
-  inputAposta.addEventListener("input", () => {
-    const valorDigitado = parseFloat(inputAposta.value);
-    if (valorDigitado > saldo) {
-      inputAposta.value = saldo;
+
+formCadastro.addEventListener(
+    "submit",
+    function (event) {
+
+        event.preventDefault();
+
+        const nome =
+            nomeJogador.value.trim();
+
+        if (nome.length < 2) {
+
+            erroCadastro.textContent =
+                "Digite pelo menos 2 caracteres.";
+
+            return;
+        }
+
+        localStorage.setItem(
+            "nomeJogador",
+            nome
+        );
+
+        jogador.textContent =
+            `⚔️ Guerreiro: ${nome}`;
+
+        erroCadastro.textContent = "";
+
+        telaCadastro.classList.add(
+            "escondido"
+        );
+
     }
-  });
-}
+);
 
-async function carregarSaldo() {
-  try {
-    const resposta = await fetch("/saldo");
-    const dados = await resposta.json();
-    saldo = Number(dados.saldo);
-    elementoSaldo.textContent = saldo.toFixed(2);
-    atualizarLimitesInputAposta();
-    if (saldo <= 0) {
-      exibirModalSaldo();
+
+/* =========================================
+   TROCAR JOGADOR
+========================================= */
+
+btnTrocarJogador.addEventListener(
+    "click",
+    function () {
+
+        localStorage.removeItem(
+            "nomeJogador"
+        );
+
+        nomeJogador.value = "";
+
+        erroCadastro.textContent = "";
+
+        telaCadastro.classList.remove(
+            "escondido"
+        );
+
     }
-  } catch (e) {
-    saldo = 100;
-    elementoSaldo.textContent = saldo.toFixed(2);
-    atualizarLimitesInputAposta();
-  }
+);
+
+
+/* =========================================
+   ATUALIZAR PAINEL
+========================================= */
+
+function atualizarPainel() {
+
+    saldo.textContent =
+        Math.floor(pontos);
+
+    multiplicadorHTML.textContent =
+        `x${multiplicador.toFixed(1)}`;
+
+    const pontosRodada =
+        Math.floor(acertos * multiplicador * 5);
+
+    lucroAtual.textContent =
+        pontosRodada;
+
 }
 
-function alterarTamanhoTabuleiro() {
-  if (emJogo) return;
-  
-  let valorSelecionado = parseInt(document.getElementById("tamanhoGrade").value);
-  dimensao = Math.min(Math.max(valorSelecionado, 5), 7);
-  
-  const totalCasas = dimensao * dimensao;
-  
-  inputMinas.max = totalCasas - 1;
-  if (parseInt(inputMinas.value) >= totalCasas) {
-    inputMinas.value = totalCasas - 1;
-  }
-  
-  criarGrade();
-}
+
+/* =========================================
+   CRIAR TABULEIRO
+========================================= */
 
 function criarGrade() {
-  elementoGrade.innerHTML = "";
-  const totalCasas = dimensao * dimensao;
 
-  elementoGrade.style.gridTemplateColumns = `repeat(${dimensao}, minmax(40px, 56px))`;
+    grade.innerHTML = "";
 
-  for (let i = 0; i < totalCasas; i++) {
-    const casa = document.createElement("button");
-    casa.className = "casa";
-    casa.dataset.index = i;
-    casa.onclick = () => clicarCasa(i);
-    casa.disabled = true;
-    elementoGrade.appendChild(casa);
-  }
-}
+    grade.style.gridTemplateColumns =
+        `repeat(${dimensao}, 1fr)`;
 
-function gerenciarBotaoAcao() {
-  if (!emJogo) {
-    iniciarJogo();
-  } else {
-    retirarLucro();
-  }
-}
+    const totalCasas =
+        dimensao * dimensao;
 
-async function iniciarJogo() {
-  const valorInput = parseFloat(inputAposta.value);
-  const minasQtd = parseInt(inputMinas.value);
-  const totalCasas = dimensao * dimensao;
+    for (
+        let i = 0;
+        i < totalCasas;
+        i++
+    ) {
 
-  if (isNaN(valorInput) || valorInput <= 0) {
-    alert("Por favor, insira um valor de aposta válido.");
-    return;
-  }
+        const casa =
+            document.createElement("button");
 
-  // Trava de segurança no clique do botão
-  if (valorInput > saldo) {
-    alert("Você não tem dracmas suficientes para essa aposta!");
-    inputAposta.value = saldo;
-    exibirModalSaldo();
-    return;
-  }
+        casa.classList.add("casa");
 
-  if (isNaN(minasQtd) || minasQtd < 1 || minasQtd >= totalCasas) {
-    alert(`Escolha entre 1 e ${totalCasas - 1} maldições de Ares.`);
-    return;
-  }
+        casa.dataset.index = i;
 
-  valorAposta = valorInput;
-  saldo -= valorAposta;
-  atualizarLimitesInputAposta();
-  atualizarSaldoBackend(saldo);
+        casa.textContent = "?";
 
-  bombas = [];
-  while (bombas.length < minasQtd) {
-    const pos = Math.floor(Math.random() * totalCasas);
-    if (!bombas.includes(pos)) {
-      bombas.push(pos);
+        casa.disabled = true;
+
+        casa.addEventListener(
+            "click",
+            function () {
+
+                clicarCasa(i, casa);
+
+            }
+        );
+
+        grade.appendChild(casa);
     }
-  }
 
-  emJogo = true;
-  acertos = 0;
-  multiplicador = 1.0;
-  elementoMensagem.textContent = "";
-
-  inputAposta.disabled = true;
-  document.getElementById("qtdMinas").disabled = true;
-  document.getElementById("tamanhoGrade").disabled = true;
-  
-  btnAcao.textContent = "Clamar Recompensa (Cash Out)";
-  btnAcao.className = "btn-acao btn-retirar";
-  btnAcao.disabled = true;
-
-  atualizarPainel();
-  criarGrade();
-
-  document.querySelectorAll(".casa").forEach(casa => casa.disabled = false);
 }
 
-function criarEfeitoExplosao(elemento) {
-  const cores = ["#ff2222", "#ff7700", "#ffcc00", "#ff0055", "#880000"];
-  const qtdParticulas = 24;
 
-  for (let i = 0; i < qtdParticulas; i++) {
-    const particula = document.createElement("div");
-    particula.className = "particula-explosao";
+/* =========================================
+   GERAR MINAS
+========================================= */
 
-    const angulo = Math.random() * Math.PI * 2;
-    const distancia = 30 + Math.random() * 50;
-    const tx = Math.cos(angulo) * distancia + "px";
-    const ty = Math.sin(angulo) * distancia + "px";
+function gerarBombas() {
 
-    particula.style.setProperty("--tx", tx);
-    particula.style.setProperty("--ty", ty);
-    particula.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
+    bombas = [];
+
+    const totalCasas =
+        dimensao * dimensao;
+
+    while (
+        bombas.length < quantidadeMinas
+    ) {
+
+        const numero =
+            Math.floor(
+                Math.random() * totalCasas
+            );
+
+        if (!bombas.includes(numero)) {
+
+            bombas.push(numero);
+
+        }
+
+    }
+
+}
+
+
+/* =========================================
+   COMEÇAR RODADA
+========================================= */
+
+function iniciarJogo() {
+
+    if (pontos <= 0) {
+
+        mensagem.textContent =
+            "Você ficou sem pontos. Recarregue a página para jogar novamente.";
+
+        return;
+    }
+
+
+    quantidadeMinas =
+        parseInt(qtdMinas.value);
+
+    dimensao =
+        parseInt(tamanhoTabuleiro.value);
+
+
+    const totalCasas =
+        dimensao * dimensao;
+
+
+    if (
+        quantidadeMinas >= totalCasas
+    ) {
+
+        mensagem.textContent =
+            "A quantidade de minas é muito alta.";
+
+        return;
+    }
+
+
+    gerarBombas();
+
+    casasClicadas = [];
+
+    acertos = 0;
+
+    multiplicador = 1.0;
+
+    emJogo = true;
+
+
+    pontos--;
+
     
-    const tamanho = 5 + Math.random() * 6;
-    particula.style.width = tamanho + "px";
-    particula.style.height = tamanho + "px";
+    btnAcao.textContent =
+        "🏆 FINALIZAR RODADA";
 
-    elemento.appendChild(particula);
+    btnAcao.classList.remove(
+        "btn-apostar"
+    );
 
-    setTimeout(() => {
-      particula.remove();
-    }, 600);
-  }
-}
+    btnAcao.classList.add(
+        "btn-retirar"
+    );
 
-function clicarCasa(index) {
-  if (!emJogo) return;
 
-  const casas = document.querySelectorAll(".casa");
-  const casaClicada = casas[index];
+    qtdMinas.disabled = true;
 
-  if (casaClicada.innerHTML !== "") return;
+    tamanhoTabuleiro.disabled = true;
 
-  if (bombas.includes(index)) {
-    casaClicada.innerHTML = "💀";
-    casaClicada.style.fontSize = "30px";
-    casaClicada.classList.add("revelado-bomba", "explosao-unica");
-    criarEfeitoExplosao(casaClicada);
-    tocarSom("sons/explosao.mp3");
 
-    finalizarJogo(false);
-  } else {
-    casaClicada.innerHTML = "👑";
-    casaClicada.style.fontSize = "30px";
-    casaClicada.classList.add("revelado-reliquia");
-    casaClicada.disabled = true;
+    mensagem.textContent =
+        "Escolha uma casa da arena!";
 
-    acertos++;
-    multiplicador += 0.5;
-
-    if (acertos === 1) {
-      btnAcao.disabled = false;
-    }
 
     atualizarPainel();
 
-    const totalCasas = dimensao * dimensao;
-    const totalDiamantes = totalCasas - bombas.length;
-    if (acertos === totalDiamantes) {
-      retirarLucro();
-    }
-  }
-}
-
-function retirarLucro() {
-  if (!emJogo || acertos === 0) return;
-  emJogo = false;
-
-  const valorGanho = valorAposta * multiplicador;
-  saldo += valorGanho;
-  atualizarLimitesInputAposta();
-  atualizarSaldoBackend(saldo);
-  tocarSom("sons/vitoria.mp3");
-
-  elementoMensagem.style.color = "#ffd700";
-  elementoMensagem.textContent = `🏛 Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
-
-  const casas = document.querySelectorAll(".casa");
-  casas.forEach((casa, idx) => {
-    casa.disabled = true;
-    if (bombas.includes(idx)) {
-      casa.innerHTML = "💀";
-      casa.style.fontSize = "30px";
-      casa.classList.add("revelado-bomba", "chacoalhar-bomba");
-    }
-  });
-
-  btnAcao.disabled = true;
-
-  setTimeout(() => {
-    inputAposta.disabled = false;
-    document.getElementById("qtdMinas").disabled = false;
-    document.getElementById("tamanhoGrade").disabled = false;
-    
-    btnAcao.textContent = "Iniciar Batalha";
-    btnAcao.className = "btn-acao btn-apostar";
-    btnAcao.disabled = false;
-
-    multiplicador = 1.0;
-    elementoMultiplicador.textContent = "1.0x";
-    elementoLucroAtual.textContent = "0.00";
-    elementoSaldo.textContent = saldo.toFixed(2);
-
     criarGrade();
-  }, 2000);
+
+
+    const casas =
+        document.querySelectorAll(".casa");
+
+    casas.forEach(function (casa) {
+
+        casa.disabled = false;
+
+    });
+
 }
+
+
+/* =========================================
+   CLICAR CASA
+========================================= */
+
+function clicarCasa(
+    index,
+    elemento
+) {
+
+    if (!emJogo) {
+        return;
+    }
+
+
+    if (
+        casasClicadas.includes(index)
+    ) {
+
+        return;
+
+    }
+
+
+    casasClicadas.push(index);
+
+
+    /* MINA */
+
+    if (
+        bombas.includes(index)
+    ) {
+
+        elemento.textContent = "💀";
+
+        elemento.classList.add(
+            "revelado-bomba"
+        );
+
+
+        mensagem.textContent =
+            "💥 Você encontrou uma mina!";
+
+
+        revelarBombas();
+
+        finalizarJogo(false);
+
+        return;
+
+    }
+
+
+    /* RELÍQUIA */
+
+    elemento.textContent = "👑";
+
+    elemento.classList.add(
+        "revelado-reliquia"
+    );
+
+    elemento.disabled = true;
+
+
+    acertos++;
+
+    multiplicador += 0.5;
+
+
+    mensagem.textContent =
+        "👑 Relíquia encontrada! Continue.";
+
+
+    atualizarPainel();
+
+
+    /* TODAS AS CASAS SEGURAS */
+
+    const totalCasas =
+        dimensao * dimensao;
+
+    const casasSeguras =
+        totalCasas - quantidadeMinas;
+
+
+    if (
+        acertos >= casasSeguras
+    ) {
+
+        finalizarJogo(true);
+
+    }
+
+}
+
+
+/* =========================================
+   REVELAR MINAS
+========================================= */
+
+function revelarBombas() {
+
+    const casas =
+        document.querySelectorAll(".casa");
+
+    bombas.forEach(function (index) {
+
+        const casa =
+            casas[index];
+
+        if (!casa) {
+            return;
+        }
+
+        casa.textContent = "💣";
+
+        casa.classList.add(
+            "revelado-bomba"
+        );
+
+    });
+
+}
+
+
+/* =========================================
+   FINALIZAR JOGO
+========================================= */
 
 function finalizarJogo(vitoria) {
-  emJogo = false;
 
-  if (!vitoria) {
-    elementoMensagem.style.color = "#ff4d4d";
-    elementoMensagem.textContent = `💥 A fúria de Ares o destruiu! Você perdeu ${valorAposta.toFixed(2)} dracmas!`;
+    emJogo = false;
 
-    const casas = document.querySelectorAll(".casa");
-    casas.forEach((casa, idx) => {
-      casa.disabled = true;
-      if (bombas.includes(idx) && !casa.classList.contains("revelado-bomba")) {
-        casa.innerHTML = "💀";
-        casa.style.fontSize = "30px";
-        casa.classList.add("revelado-bomba");
-      }
-    });
-  }
 
-  inputAposta.disabled = false;
-  document.getElementById("qtdMinas").disabled = false;
-  document.getElementById("tamanhoGrade").disabled = false;
-  btnAcao.textContent = "Iniciar Batalha";
-  btnAcao.className = "btn-acao btn-apostar";
-  btnAcao.disabled = false;
+    const ganho =
+        Math.floor(
+            acertos * multiplicador * 5
+        );
 
-  if (saldo <= 0) {
-    setTimeout(exibirModalSaldo, 600);
-  }
+
+    if (vitoria) {
+
+        pontos += ganho;
+
+        mensagem.textContent =
+            `🏆 Vitória! Você ganhou ${ganho} pontos.`;
+
+    } else {
+
+        mensagem.textContent =
+            "💀 Você perdeu a rodada.";
+
+    }
+
+
+    atualizarPainel();
+
+
+    qtdMinas.disabled = false;
+
+    tamanhoTabuleiro.disabled = false;
+
+
+    btnAcao.textContent =
+        "⚔️ COMEÇAR RODADA";
+
+    btnAcao.classList.remove(
+        "btn-retirar"
+    );
+
+    btnAcao.classList.add(
+        "btn-apostar"
+    );
+
+
+    setTimeout(function () {
+
+        acertos = 0;
+
+        multiplicador = 1.0;
+
+        lucroAtual.textContent = "0";
+
+        criarGrade();
+
+        atualizarPainel();
+
+    }, 2000);
+
 }
 
-function atualizarPainel() {
-  elementoSaldo.textContent = saldo.toFixed(2);
-  elementoMultiplicador.textContent = multiplicador.toFixed(1) + "x";
-  elementoLucroAtual.textContent = (valorAposta * multiplicador).toFixed(2);
-}
 
-async function atualizarSaldoBackend(novoSaldo) {
-  try {
-    await fetch("/saldo", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ saldo: novoSaldo })
-    });
-  } catch (e) {}
-}
+/* =========================================
+   BOTÃO PRINCIPAL
+========================================= */
+
+btnAcao.addEventListener(
+    "click",
+    function () {
+
+        if (!emJogo) {
+
+            iniciarJogo();
+
+        } else {
+
+            finalizarJogo(true);
+
+        }
+
+    }
+);
+
+
+/* =========================================
+   TAMANHO DO TABULEIRO
+========================================= */
+
+tamanhoTabuleiro.addEventListener(
+    "change",
+    function () {
+
+        if (emJogo) {
+            return;
+        }
+
+        dimensao =
+            parseInt(
+                tamanhoTabuleiro.value
+            );
+
+        criarGrade();
+
+    }
+);
+
+
+/* =========================================
+   EFEITO DE FUNDO
+========================================= */
 
 function gerarFagulhasFundo() {
-  let container = document.getElementById("fagulhas-container");
-  if (!container) {
-    container = document.createElement("div");
-    container.id = "fagulhas-container";
-    document.body.appendChild(container);
-  }
 
-  const cores = ["#ff3300", "#ff7700", "#ffaa00", "#ff0000"];
-  const quantidade = 35;
+    for (
+        let i = 0;
+        i < 35;
+        i++
+    ) {
 
-  for (let i = 0; i < quantidade; i++) {
-    const fagulha = document.createElement("div");
-    fagulha.className = "fagulha";
-    
-    fagulha.style.left = Math.random() * 100 + "vw";
-    
-    const duracao = 3 + Math.random() * 5;
-    fagulha.style.animationDuration = duracao + "s";
-    fagulha.style.animationDelay = (Math.random() * 4) + "s";
-    
-    const tamanho = 3 + Math.random() * 5;
-    fagulha.style.width = tamanho + "px";
-    fagulha.style.height = tamanho + "px";
-    fagulha.style.backgroundColor = cores[Math.floor(Math.random() * cores.length)];
-    fagulha.style.boxShadow = `0 0 8px ${fagulha.style.backgroundColor}`;
+        const fagulha =
+            document.createElement("div");
 
-    container.appendChild(fagulha);
-  }
+        fagulha.classList.add(
+            "fagulha"
+        );
+
+        fagulha.style.left =
+            `${Math.random() * 100}%`;
+
+        fagulha.style.animationDelay =
+            `${Math.random() * 6}s`;
+
+        fagulha.style.animationDuration =
+            `${3 + Math.random() * 5}s`;
+
+        fagulhasContainer.appendChild(
+            fagulha
+        );
+
+    }
+
 }
 
-carregarSaldo();
-alterarTamanhoTabuleiro();
+
+/* =========================================
+   INICIALIZAÇÃO
+========================================= */
+
+verificarCadastro();
+
+criarGrade();
+
+atualizarPainel();
+
 gerarFagulhasFundo();
