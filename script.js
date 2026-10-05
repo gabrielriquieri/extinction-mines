@@ -77,7 +77,8 @@ function criarGrade() {
   elementoGrade.innerHTML = "";
   const totalCasas = dimensao * dimensao;
 
-  elementoGrade.style.gridTemplateColumns = `repeat(${dimensao}, 56px)`;
+  // Ajusta a grelha dinamicamente para caber perfeitamente no ecrã do notebook
+  elementoGrade.style.gridTemplateColumns = `repeat(${dimensao}, minmax(40px, 56px))`;
 
   for (let i = 0; i < totalCasas; i++) {
     const casa = document.createElement("button");
@@ -88,7 +89,6 @@ function criarGrade() {
     elementoGrade.appendChild(casa);
   }
 }
-
 function gerenciarBotaoAcao() {
   if (!emJogo) {
     iniciarJogo();
