@@ -35,7 +35,7 @@ async function carregarSaldo() {
   try {
     const resposta = await fetch("/saldo");
     const dados = await resposta.json();
-    saldo = dados.saldo;
+    saldo = Number(dados.saldo);
     elementoSaldo.textContent = saldo.toFixed(2);
     if (saldo <= 0) {
       exibirModalSaldo();
@@ -91,13 +91,15 @@ async function iniciarJogo() {
   const minasQtd = parseInt(inputMinas.value);
   const totalCasas = dimensao * dimensao;
 
-  if (saldo <= 0 || inputAposta > saldo) {
-    exibirModalSaldo();
+  if (isNaN(inputAposta) || inputAposta <= 0) {
+    alert("Por favor, insira um valor de aposta válido.");
     return;
   }
 
-  if (isNaN(inputAposta) || inputAposta <= 0) {
-    alert("Por favor, insira um valor de aposta válido.");
+  // CORREÇÃO DO BUG: Impede apostar mais do que o saldo atual
+  if (Number(inputAposta.toFixed(2)) > Number(saldo.toFixed(2))) {
+    alert("Você não tem dracmas suficientes para essa aposta!");
+    exibirModalSaldo();
     return;
   }
 
@@ -175,7 +177,6 @@ function clicarCasa(index) {
   if (casaClicada.innerHTML !== "") return;
 
   if (bombas.includes(index)) {
-    // Revela a bomba como caveira
     casaClicada.innerHTML = "💀";
     casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-bomba", "explosao-unica");
@@ -184,7 +185,6 @@ function clicarCasa(index) {
 
     finalizarJogo(false);
   } else {
-    // Revela a casa premiada sempre como Coroa
     casaClicada.innerHTML = "👑";
     casaClicada.style.fontSize = "30px";
     casaClicada.classList.add("revelado-reliquia");
@@ -217,7 +217,7 @@ function retirarLucro() {
   tocarSom("sons/vitoria.mp3");
 
   elementoMensagem.style.color = "#ffd700";
-  elementoMensagem.textContent = `🏛️️ Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
+  elementoMensagem.textContent = `🏛 Os Deuses abençoaram sua jornada! Você ganhou ${valorGanho.toFixed(2)} dracmas!`;
 
   const casas = document.querySelectorAll(".casa");
   casas.forEach((casa, idx) => {
@@ -295,7 +295,6 @@ async function atualizarSaldoBackend(novoSaldo) {
   } catch (e) {}
 }
 
-// --- Gerador de Fagulhas de Fogo Subindo ---
 function gerarFagulhasFundo() {
   let container = document.getElementById("fagulhas-container");
   if (!container) {
@@ -327,7 +326,6 @@ function gerarFagulhasFundo() {
   }
 }
 
-// Iniciar funções
 carregarSaldo();
 alterarTamanhoTabuleiro();
 gerarFagulhasFundo();
