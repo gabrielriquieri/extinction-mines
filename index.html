@@ -408,37 +408,3 @@ formCadastro.addEventListener(
 
     }
 );
-```
-
-E mantenha no HTML do jogo esta parte:
-
-```html
-<p id="jogador"></p>
-```
-
-Por fim, no final do JavaScript, deixe:
-
-```javascript
-verificarCadastro();
-carregarSaldo();
-alterarTamanhoTabuleiro();
-gerarFagulhasFundo();
-```
-
-### Como vai funcionar
-
-**Primeira vez:**
-
-`Site → Tela de cadastro → Digita nome → Entrar no jogo → Tabuleiro`
-
-**Depois:**
-
-`Site → Nome já salvo → Jogo`
-
-Se quiser testar novamente a tela de cadastro, abra o console do navegador e execute:
-
-```javascript
-localStorage.removeItem("nomeJogador");
-```
-
-Depois atualize a página.
