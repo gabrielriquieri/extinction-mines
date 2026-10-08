@@ -18,7 +18,6 @@ let dimensao = 6;
 let quantidadeMinas = 5;
 let valorApostaAtual = 10;
 
-// O valor base adicionado a cada espada encontrada passa a ser fixo em 2 pontos adicionais
 const VALOR_POR_ESPADA = 2;
 
 
@@ -35,7 +34,7 @@ const btnGoogle = document.getElementById("btnGoogle");
 
 
 /* =========================================
-   ELEMENTOS DO JOGO
+   ELEMENTOS DO JOGO E OVERLAY
 ========================================= */
 
 const jogo = document.getElementById("jogo");
@@ -50,6 +49,32 @@ const qtdMinas = document.getElementById("qtdMinas");
 const tamanhoTabuleiro = document.getElementById("tamanhoTabuleiro");
 const valorAposta = document.getElementById("valorAposta");
 const btnTrocarJogador = document.getElementById("btnTrocarJogador");
+
+/* Overlay temporizado */
+const overlayStatus = document.getElementById("overlayStatus");
+const textoStatus = document.getElementById("textoStatus");
+let timerOverlay = null;
+
+
+/* =========================================
+   EXIBIR TELA DE ALERTA (2 SEGUNDOS)
+========================================= */
+
+function exibirOverlayStatus(mensagemTexto, tipoClasse) {
+
+    if (timerOverlay) clearTimeout(timerOverlay);
+
+    textoStatus.textContent = mensagemTexto;
+    textoStatus.className = `texto-status ${tipoClasse}`;
+
+    overlayStatus.classList.remove("escondido");
+
+    // Oculta após 2000ms (2 segundos)
+    timerOverlay = setTimeout(function () {
+        overlayStatus.classList.add("escondido");
+    }, 2000);
+
+}
 
 
 /* =========================================
@@ -155,7 +180,6 @@ function atualizarInterface() {
     saldo.textContent = pontos;
     multiplicadorTexto.textContent = multiplicador.toFixed(1) + "x";
     
-    // Lucro da rodada calculado com base nas espadas encontradas (2 pontos por espada)
     const lucro = emJogo ? (acertos * VALOR_POR_ESPADA) : 0;
     lucroAtual.textContent = lucro;
 }
@@ -177,7 +201,7 @@ tamanhoTabuleiro.addEventListener("change", function () {
 
 
 /* =========================================
-   CRIAR TABULEIRO VAZIO (DESATIVADO)
+   CRIAR TABULEIRO VAZIO
 ========================================= */
 
 function criarTabuleiroVazio() {
@@ -245,6 +269,12 @@ btnAcao.addEventListener("click", function () {
 
 function iniciarJogo() {
 
+    if (pontos <= 0) {
+        exibirOverlayStatus("SALDO INSUFICIENTE", "alerta");
+        mensagem.textContent = "Você não possui pontos para jogar.";
+        return;
+    }
+
     const apostaDesejada = Number(valorAposta.value);
 
     if (isNaN(apostaDesejada) || apostaDesejada <= 0) {
@@ -253,6 +283,7 @@ function iniciarJogo() {
     }
 
     if (apostaDesejada > pontos) {
+        exibirOverlayStatus("SALDO INSUFICIENTE", "alerta");
         mensagem.textContent = "Você não possui pontos suficientes para essa aposta.";
         return;
     }
@@ -317,7 +348,7 @@ function clicarCasa(indice, casa) {
 
     casasClicadas.push(indice);
 
-    /* BOMBA */
+    /* BOMBA (PERDEU A RODADA) */
     if (bombas.includes(indice)) {
         casa.textContent = "💣";
         casa.classList.add("bomba");
@@ -328,22 +359,27 @@ function clicarCasa(indice, casa) {
         btnAcao.textContent = "⚔️ COMEÇAR RODADA";
         btnAcao.disabled = true;
 
-        mensagem.textContent = "💥 Você encontrou uma mina! Perdeu a aposta.";
         multiplicador = 1.0;
         atualizarInterface();
+
+        if (pontos <= 0) {
+            exibirOverlayStatus("SALDO INSUFICIENTE", "alerta");
+            mensagem.textContent = "Seu saldo acabou!";
+        } else {
+            exibirOverlayStatus("RODADA PERDIDA", "derrota");
+            mensagem.textContent = "💥 Você encontrou uma mina! Perdeu a aposta.";
+        }
         return;
     }
 
     /* CASA SEGURA (ESPADA) */
     acertos++;
-    // O multiplicador aumenta levemente a cada acerto (+0.05x)
     multiplicador += 0.05;
 
     casa.textContent = "⚔️";
     casa.classList.add("segura");
     casa.classList.add("desativada");
 
-    // Ativa o botão para retirar assim que encontra a 1ª espada
     btnAcao.disabled = false;
 
     const pontosRodadaAtual = acertos * VALOR_POR_ESPADA;
@@ -351,7 +387,7 @@ function clicarCasa(indice, casa) {
 
     atualizarInterface();
 
-    /* VERIFICAR VITÓRIA */
+    /* VERIFICAR VITÓRIA TOTAL */
     const totalCasas = dimensao * dimensao;
     if (acertos >= totalCasas - quantidadeMinas) {
         finalizarVitoria();
@@ -382,7 +418,7 @@ function revelarBombas() {
 
 
 /* =========================================
-   ENCERRAR RODADA (RECOLHER PONTOS)
+   ENCERRAR RODADA (RESGATAR PRÊMIO)
 ========================================= */
 
 function encerrarRodadaComSucesso() {
@@ -390,7 +426,6 @@ function encerrarRodadaComSucesso() {
 
     emJogo = false;
     
-    // Devolve a aposta inicial + os pontos acumulados pelas espadas (2 pontos por espada)
     const ganhosRodada = valorApostaAtual + (acertos * VALOR_POR_ESPADA);
     pontos += ganhosRodada;
 
@@ -399,6 +434,8 @@ function encerrarRodadaComSucesso() {
 
     btnAcao.textContent = "⚔️ COMEÇAR RODADA";
     btnAcao.disabled = true;
+
+    exibirOverlayStatus(`GANHOU ${ganhosRodada} PONTOS!`, "vitoria");
 
     mensagem.textContent = `💰 Você encerrou a rodada e garantiu ${ganhosRodada} pontos!`;
 
@@ -413,13 +450,15 @@ function encerrarRodadaComSucesso() {
 function finalizarVitoria() {
 
     emJogo = false;
-    const ganhosRodada = valorApostaAtual + (acertos * VALOR_POR_ESPADA) + 10; // Bônus extra por limpar a arena
+    const ganhosRodada = valorApostaAtual + (acertos * VALOR_POR_ESPADA) + 10;
     pontos += ganhosRodada;
 
     liberarCampos();
 
     btnAcao.textContent = "⚔️ COMEÇAR RODADA";
     btnAcao.disabled = true;
+
+    exibirOverlayStatus(`VITÓRIA! +${ganhosRodada} PONTOS`, "vitoria");
 
     mensagem.textContent = `🏆 VITÓRIA TOTAL! Você limpou a arena e ganhou ${ganhosRodada} pontos!`;
 
