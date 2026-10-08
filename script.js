@@ -16,6 +16,7 @@ let acertos = 0;
 let multiplicador = 1.0;
 let dimensao = 6;
 let quantidadeMinas = 5;
+let valorApostaAtual = 10;
 
 
 /* =========================================
@@ -44,6 +45,7 @@ const btnAcao = document.getElementById("btnAcao");
 const mensagem = document.getElementById("mensagem");
 const qtdMinas = document.getElementById("qtdMinas");
 const tamanhoTabuleiro = document.getElementById("tamanhoTabuleiro");
+const valorAposta = document.getElementById("valorAposta");
 const btnTrocarJogador = document.getElementById("btnTrocarJogador");
 
 
@@ -156,7 +158,10 @@ btnTrocarJogador.addEventListener("click", function () {
 function atualizarInterface() {
     saldo.textContent = pontos;
     multiplicadorTexto.textContent = multiplicador.toFixed(1) + "x";
-    lucroAtual.textContent = acertos;
+    
+    // Pontos da rodada calculados com base no valor apostado e multiplicador
+    const lucro = emJogo ? Math.floor(valorApostaAtual * multiplicador) : 0;
+    lucroAtual.textContent = lucro;
 }
 
 
@@ -199,20 +204,28 @@ function criarTabuleiroVazio() {
 
 
 /* =========================================
-   COMEÇAR RODADA
+   COMEÇAR / FINALIZAR RODADA
 ========================================= */
 
-btnAcao.addEventListener("click", iniciarJogo);
+btnAcao.addEventListener("click", function () {
+    if (!emJogo) {
+        iniciarJogo();
+    } else if (acertos > 0) {
+        encerrarRodadaComSucesso();
+    }
+});
 
 function iniciarJogo() {
 
-    if (emJogo) {
-        mensagem.textContent = "Você já está em uma rodada.";
+    const apostaDesejada = Number(valorAposta.value);
+
+    if (isNaN(apostaDesejada) || apostaDesejada <= 0) {
+        mensagem.textContent = "Digite uma quantia válida para a aposta.";
         return;
     }
 
-    if (pontos <= 0) {
-        mensagem.textContent = "Você não possui pontos suficientes para começar.";
+    if (apostaDesejada > pontos) {
+        mensagem.textContent = "Você não possui pontos suficientes para essa aposta.";
         return;
     }
 
@@ -226,7 +239,9 @@ function iniciarJogo() {
         return;
     }
 
-    pontos -= 1;
+    valorApostaAtual = apostaDesejada;
+    pontos -= valorApostaAtual;
+    
     emJogo = true;
     bombas = [];
     casasClicadas = [];
@@ -243,7 +258,15 @@ function iniciarJogo() {
 
     criarTabuleiro();
 
-    btnAcao.textContent = "🏳️ ENCERRAR RODADA";
+    // Bloqueia a alteração dos campos durante a rodada
+    valorAposta.disabled = true;
+    qtdMinas.disabled = true;
+    tamanhoTabuleiro.disabled = true;
+
+    // Altera o botão para Finalizar, mas DESATIVADO até clicar em uma casa
+    btnAcao.textContent = "💰 ENCERRAR RODADA";
+    btnAcao.disabled = true;
+
     mensagem.textContent = "Escolha uma casa da arena!";
 
     atualizarInterface();
@@ -301,8 +324,12 @@ function clicarCasa(indice, casa) {
         casa.classList.add("bomba");
         revelarBombas();
         emJogo = false;
+        
+        liberarCampos();
         btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-        mensagem.textContent = "💥 Você encontrou uma mina! A rodada terminou.";
+        btnAcao.disabled = false;
+
+        mensagem.textContent = "💥 Você encontrou uma mina! Perdeu a aposta.";
         multiplicador = 1.0;
         atualizarInterface();
         return;
@@ -316,8 +343,10 @@ function clicarCasa(indice, casa) {
     casa.classList.add("segura");
     casa.classList.add("desativada");
 
-    pontos += 1;
-    mensagem.textContent = `⚔️ Acerto! Você encontrou uma casa segura.`;
+    // Habilita o botão de encerrar a partir do primeiro acerto!
+    btnAcao.disabled = false;
+
+    mensagem.textContent = `⚔️ Acerto! Multiplicador subiu para ${multiplicador.toFixed(1)}x.`;
 
     atualizarInterface();
 
@@ -352,17 +381,44 @@ function revelarBombas() {
 
 
 /* =========================================
-   VITÓRIA
+   ENCERRAR RODADA (RETIRAR GANHOS)
+========================================= */
+
+function encerrarRodadaComSucesso() {
+    if (!emJogo || acertos === 0) return;
+
+    emJogo = false;
+    const premio = Math.floor(valorApostaAtual * multiplicador);
+    pontos += premio;
+
+    revelarBombas();
+    liberarCampos();
+
+    btnAcao.textContent = "⚔️ COMEÇAR RODADA";
+    btnAcao.disabled = false;
+
+    mensagem.textContent = `💰 Você encerrou a rodada e garantiu ${premio} pontos!`;
+
+    atualizarInterface();
+}
+
+
+/* =========================================
+   VITÓRIA COMPLETA
 ========================================= */
 
 function finalizarVitoria() {
 
     emJogo = false;
-    const bonus = Math.floor(multiplicador);
-    pontos += bonus;
+    const premio = Math.floor(valorApostaAtual * multiplicador);
+    pontos += premio;
+
+    liberarCampos();
 
     btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-    mensagem.textContent = `🏆 VITÓRIA! Você encontrou todas as casas seguras e ganhou ${bonus} ponto(s) de bônus.`;
+    btnAcao.disabled = false;
+
+    mensagem.textContent = `🏆 VITÓRIA TOTAL! Você limpou a arena e ganhou ${premio} pontos!`;
 
     revelarBombas();
     atualizarInterface();
@@ -371,24 +427,14 @@ function finalizarVitoria() {
 
 
 /* =========================================
-   BOTÃO DE ENCERRAR RODADA
+   LIBERAR CAMPOS DE CONFIGURAÇÃO
 ========================================= */
 
-btnAcao.addEventListener("dblclick", function () {
-
-    if (!emJogo) {
-        return;
-    }
-
-    emJogo = false;
-    revelarBombas();
-
-    btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-    mensagem.textContent = "🏳️ Rodada encerrada.";
-
-    atualizarInterface();
-
-});
+function liberarCampos() {
+    valorAposta.disabled = false;
+    qtdMinas.disabled = false;
+    tamanhoTabuleiro.disabled = false;
+}
 
 
 /* =========================================
