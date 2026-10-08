@@ -18,6 +18,9 @@ let dimensao = 6;
 let quantidadeMinas = 5;
 let valorApostaAtual = 10;
 
+// O valor base adicionado a cada espada encontrada passa a ser fixo em 2 pontos adicionais
+const VALOR_POR_ESPADA = 2;
+
 
 /* =========================================
    ELEMENTOS DO CADASTRO / LOGIN
@@ -62,9 +65,6 @@ formCadastro.addEventListener("submit", function (event) {
     const emailValor = email.value.trim();
     const senhaValor = senha.value;
 
-    /* -------------------------
-       VALIDAR EMAIL (DOMÍNIOS PERMITIDOS)
-    ------------------------- */
     const emailValido = /^[a-zA-Z0-9._%+-]+@(gmail|hotmail|icloud|yahoo|outlook)\.com(\.br)?$/i;
 
     if (!emailValido.test(emailValor)) {
@@ -73,16 +73,12 @@ formCadastro.addEventListener("submit", function (event) {
         return;
     }
 
-    /* -------------------------
-       VALIDAR SENHA
-    ------------------------- */
     if (senhaValor.length < 6) {
         erroCadastro.textContent = "A senha precisa ter pelo menos 6 caracteres.";
         senha.focus();
         return;
     }
 
-    /* Usar o prefixo do e-mail como nome do jogador na arena */
     const usuario = emailValor.split("@")[0];
 
     localStorage.setItem("nomeJogador", usuario);
@@ -92,7 +88,7 @@ formCadastro.addEventListener("submit", function (event) {
     telaCadastro.classList.add("escondido");
     jogo.classList.remove("escondido");
 
-    mensagem.textContent = "Escolha as configurações e comece a rodada!";
+    mensagem.textContent = "Escolha uma casa no tabuleiro para iniciar a rodada!";
 
     atualizarInterface();
 
@@ -100,7 +96,7 @@ formCadastro.addEventListener("submit", function (event) {
 
 
 /* =========================================
-   ENTRAR COM GOOGLE (PREENCHIMENTO AUTOMÁTICO)
+   ENTRAR COM GOOGLE
 ========================================= */
 
 btnGoogle.addEventListener("click", function () {
@@ -159,8 +155,8 @@ function atualizarInterface() {
     saldo.textContent = pontos;
     multiplicadorTexto.textContent = multiplicador.toFixed(1) + "x";
     
-    // Pontos da rodada calculados com base no valor apostado e multiplicador
-    const lucro = emJogo ? Math.floor(valorApostaAtual * multiplicador) : 0;
+    // Lucro da rodada calculado com base nas espadas encontradas (2 pontos por espada)
+    const lucro = emJogo ? (acertos * VALOR_POR_ESPADA) : 0;
     lucroAtual.textContent = lucro;
 }
 
@@ -181,7 +177,7 @@ tamanhoTabuleiro.addEventListener("change", function () {
 
 
 /* =========================================
-   CRIAR TABULEIRO VAZIO
+   CRIAR TABULEIRO VAZIO (DESATIVADO)
 ========================================= */
 
 function criarTabuleiroVazio() {
@@ -200,11 +196,42 @@ function criarTabuleiroVazio() {
         grade.appendChild(casa);
     }
 
+    btnAcao.disabled = true;
+    btnAcao.textContent = "⚔️ COMEÇAR RODADA";
+
 }
 
 
 /* =========================================
-   COMEÇAR / FINALIZAR RODADA
+   PREPARAR TABULEIRO INTERATIVO
+========================================= */
+
+function prepararTabuleiroInterativo() {
+
+    grade.innerHTML = "";
+    grade.style.gridTemplateColumns = `repeat(${dimensao}, 1fr)`;
+
+    const total = dimensao * dimensao;
+
+    for (let i = 0; i < total; i++) {
+        const casa = document.createElement("button");
+        casa.classList.add("casa");
+        casa.type = "button";
+        casa.dataset.index = i;
+        casa.textContent = "?";
+
+        casa.addEventListener("click", function () {
+            clicarCasa(i, casa);
+        });
+
+        grade.appendChild(casa);
+    }
+
+}
+
+
+/* =========================================
+   BOTÃO DE AÇÃO (COMEÇAR / FINALIZAR)
 ========================================= */
 
 btnAcao.addEventListener("click", function () {
@@ -214,6 +241,7 @@ btnAcao.addEventListener("click", function () {
         encerrarRodadaComSucesso();
     }
 });
+
 
 function iniciarJogo() {
 
@@ -248,7 +276,7 @@ function iniciarJogo() {
     acertos = 0;
     multiplicador = 1.0;
 
-    /* Criar minas */
+    /* Gerar minas */
     while (bombas.length < quantidadeMinas) {
         const numero = Math.floor(Math.random() * totalCasas);
         if (!bombas.includes(numero)) {
@@ -256,18 +284,16 @@ function iniciarJogo() {
         }
     }
 
-    criarTabuleiro();
+    prepararTabuleiroInterativo();
 
-    // Bloqueia a alteração dos campos durante a rodada
     valorAposta.disabled = true;
     qtdMinas.disabled = true;
     tamanhoTabuleiro.disabled = true;
 
-    // Altera o botão para Finalizar, mas DESATIVADO até clicar em uma casa
     btnAcao.textContent = "💰 ENCERRAR RODADA";
     btnAcao.disabled = true;
 
-    mensagem.textContent = "Escolha uma casa da arena!";
+    mensagem.textContent = "Escolha uma casa no tabuleiro para jogar!";
 
     atualizarInterface();
 
@@ -275,41 +301,14 @@ function iniciarJogo() {
 
 
 /* =========================================
-   CRIAR TABULEIRO
-========================================= */
-
-function criarTabuleiro() {
-
-    grade.innerHTML = "";
-    grade.style.gridTemplateColumns = `repeat(${dimensao}, 1fr)`;
-
-    const total = dimensao * dimensao;
-
-    for (let i = 0; i < total; i++) {
-        const casa = document.createElement("button");
-        casa.classList.add("casa");
-        casa.type = "button";
-        casa.dataset.index = i;
-        casa.textContent = "?";
-
-        casa.addEventListener("click", function () {
-            clicarCasa(i, casa);
-        });
-
-        grade.appendChild(casa);
-    }
-
-}
-
-
-/* =========================================
-   CLICAR EM CASA
+   CLICAR EM UMA CASA DO TABULEIRO
 ========================================= */
 
 function clicarCasa(indice, casa) {
 
     if (!emJogo) {
-        return;
+        iniciarJogo();
+        if (!emJogo) return;
     }
 
     if (casasClicadas.includes(indice)) {
@@ -327,7 +326,7 @@ function clicarCasa(indice, casa) {
         
         liberarCampos();
         btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-        btnAcao.disabled = false;
+        btnAcao.disabled = true;
 
         mensagem.textContent = "💥 Você encontrou uma mina! Perdeu a aposta.";
         multiplicador = 1.0;
@@ -335,18 +334,20 @@ function clicarCasa(indice, casa) {
         return;
     }
 
-    /* CASA SEGURA */
+    /* CASA SEGURA (ESPADA) */
     acertos++;
-    multiplicador += 0.2;
+    // O multiplicador aumenta levemente a cada acerto (+0.05x)
+    multiplicador += 0.05;
 
     casa.textContent = "⚔️";
     casa.classList.add("segura");
     casa.classList.add("desativada");
 
-    // Habilita o botão de encerrar a partir do primeiro acerto!
+    // Ativa o botão para retirar assim que encontra a 1ª espada
     btnAcao.disabled = false;
 
-    mensagem.textContent = `⚔️ Acerto! Multiplicador subiu para ${multiplicador.toFixed(1)}x.`;
+    const pontosRodadaAtual = acertos * VALOR_POR_ESPADA;
+    mensagem.textContent = `⚔️ Espada encontrada! (+${VALOR_POR_ESPADA} pontos | Total na rodada: ${pontosRodadaAtual})`;
 
     atualizarInterface();
 
@@ -381,23 +382,25 @@ function revelarBombas() {
 
 
 /* =========================================
-   ENCERRAR RODADA (RETIRAR GANHOS)
+   ENCERRAR RODADA (RECOLHER PONTOS)
 ========================================= */
 
 function encerrarRodadaComSucesso() {
     if (!emJogo || acertos === 0) return;
 
     emJogo = false;
-    const premio = Math.floor(valorApostaAtual * multiplicador);
-    pontos += premio;
+    
+    // Devolve a aposta inicial + os pontos acumulados pelas espadas (2 pontos por espada)
+    const ganhosRodada = valorApostaAtual + (acertos * VALOR_POR_ESPADA);
+    pontos += ganhosRodada;
 
     revelarBombas();
     liberarCampos();
 
     btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-    btnAcao.disabled = false;
+    btnAcao.disabled = true;
 
-    mensagem.textContent = `💰 Você encerrou a rodada e garantiu ${premio} pontos!`;
+    mensagem.textContent = `💰 Você encerrou a rodada e garantiu ${ganhosRodada} pontos!`;
 
     atualizarInterface();
 }
@@ -410,15 +413,15 @@ function encerrarRodadaComSucesso() {
 function finalizarVitoria() {
 
     emJogo = false;
-    const premio = Math.floor(valorApostaAtual * multiplicador);
-    pontos += premio;
+    const ganhosRodada = valorApostaAtual + (acertos * VALOR_POR_ESPADA) + 10; // Bônus extra por limpar a arena
+    pontos += ganhosRodada;
 
     liberarCampos();
 
     btnAcao.textContent = "⚔️ COMEÇAR RODADA";
-    btnAcao.disabled = false;
+    btnAcao.disabled = true;
 
-    mensagem.textContent = `🏆 VITÓRIA TOTAL! Você limpou a arena e ganhou ${premio} pontos!`;
+    mensagem.textContent = `🏆 VITÓRIA TOTAL! Você limpou a arena e ganhou ${ganhosRodada} pontos!`;
 
     revelarBombas();
     atualizarInterface();
@@ -442,5 +445,5 @@ function liberarCampos() {
 ========================================= */
 
 verificarJogador();
-criarTabuleiroVazio();
+prepararTabuleiroInterativo();
 atualizarInterface();
